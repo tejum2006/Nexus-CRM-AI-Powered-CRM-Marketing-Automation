@@ -1,0 +1,4 @@
+name,email,phone,company,industry,location,status,segments,tags
+Alice Smith,alice@example.com,555-0001,TechNova,IT,Seattle,Lead,Lead;Premium,vip
+Bob Jones,bob@example.com,555-0002,GlobalCorp,Finance,New York,Active,Returning,q1
+Charlie Brown,charlie@example.com,555-0003,Peanuts Inc,Entertainment,LA,Inactive,Lost,

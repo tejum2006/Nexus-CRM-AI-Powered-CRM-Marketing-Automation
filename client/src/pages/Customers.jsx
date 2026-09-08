@@ -1,0 +1,187 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Users, Download, Upload } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import CustomerTable from '../components/customers/CustomerTable';
+import CustomerForm from '../components/customers/CustomerForm';
+import ImportModal from '../components/customers/ImportModal';
+import SearchBar from '../components/ui/SearchBar';
+import FilterPanel from '../components/customers/FilterPanel';
+import Pagination from '../components/ui/Pagination';
+import * as customerService from '../services/customerService';
+import * as segmentService from '../services/segmentService';
+import { useToast } from '../context/ToastContext';
+import { useAuth } from '../hooks/useAuth';
+
+const Customers = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  const [customers, setCustomers] = useState([]);
+  const [availableSegments, setAvailableSegments] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({});
+  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const limit = 10;
+
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const [segRes, tagsRes] = await Promise.all([
+          segmentService.getSegments(),
+          customerService.getAllTags()
+        ]);
+        if (segRes.success) setAvailableSegments(segRes.data);
+        if (tagsRes.success) setAvailableTags(tagsRes.data);
+      } catch (err) {
+        console.error('Failed to fetch metadata:', err);
+      }
+    };
+    fetchMetadata();
+  }, []);
+
+  const fetchCustomers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const sortStr = sortConfig.direction === 'desc' ? `-${sortConfig.key}` : sortConfig.key;
+      const data = await customerService.getCustomers({ page, limit, search, sort: sortStr, ...filters });
+      if (data.success) {
+        setCustomers(data.data.customers);
+        setTotalPages(data.data.pagination.pages);
+        setTotalItems(data.data.pagination.total);
+      }
+    } catch (error) {
+      console.error('Failed to fetch customers:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, filters, sortConfig]);
+
+  useEffect(() => { fetchCustomers(); }, [fetchCustomers]);
+
+  const handleSearch = (term) => { setSearch(term); setPage(1); };
+  const handleFilterChange = (newFilters) => { setFilters(newFilters); setPage(1); };
+  const handleClearFilters = () => { setFilters({}); setPage(1); };
+  const handleSort = (key) => {
+    setSortConfig(cur => ({ key, direction: cur.key === key && cur.direction === 'asc' ? 'desc' : 'asc' }));
+  };
+
+  const handleCreateCustomer = async (data) => {
+    try {
+      setIsSubmitting(true);
+      await customerService.createCustomer(data);
+      setIsFormOpen(false);
+      fetchCustomers();
+      toast.success('Customer added!');
+    } catch {
+      toast.error('Failed to add customer.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      toast.info('Exporting customers...');
+      await customerService.exportCustomers({ search, ...filters });
+    } catch {
+      toast.error('Failed to export.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <div className="page-full">
+      {/* Header */}
+      <div className="page-header shrink-0">
+        <div>
+          <h1 className="text-display mb-1">Customers</h1>
+          <p className="text-body">Manage your contacts, segments, and relationships.</p>
+        </div>
+        <div className="page-header-actions">
+          <button className="btn btn-outline" onClick={() => setIsImportOpen(true)}>
+            <Upload size={14} />
+            <span className="hide-mobile">Import</span>
+          </button>
+          {user?.role === 'Admin' && (
+            <button className="btn btn-outline" onClick={handleExport} disabled={isExporting}>
+              <Download size={14} />
+              <span className="hide-mobile">{isExporting ? 'Exporting…' : 'Export'}</span>
+            </button>
+          )}
+          <button className="btn btn-primary" onClick={() => setIsFormOpen(true)}>
+            <Plus size={14} />
+            <span className="hide-mobile">Add Customer</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Table Card */}
+      <div className="card flex flex-col flex-1 min-h-0 overflow-hidden">
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row gap-3 p-4 border-b shrink-0"
+          style={{ borderColor: 'var(--border)', background: 'var(--bg-elevated)' }}>
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder="Search customers…"
+            className="flex-1 sm:max-w-xs"
+          />
+          <FilterPanel
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
+            availableSegments={availableSegments}
+            availableTags={availableTags}
+          />
+        </div>
+
+        {/* Table */}
+        <div className="flex-1 overflow-auto" style={{ background: 'var(--bg-base)' }}>
+          <CustomerTable
+            customers={customers}
+            loading={loading}
+            onSort={handleSort}
+            sortConfig={sortConfig}
+            onRowClick={(id) => navigate(`/customers/${id}`)}
+            availableSegments={availableSegments}
+          />
+        </div>
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={limit}
+          onPageChange={setPage}
+        />
+      </div>
+
+      <CustomerForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleCreateCustomer}
+        isSubmitting={isSubmitting}
+      />
+      <ImportModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImportSuccess={() => { setIsImportOpen(false); fetchCustomers(); }}
+      />
+    </div>
+  );
+};
+
+export default Customers;
