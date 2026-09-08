@@ -61,8 +61,8 @@ export default function Login() {
         {/* Brand */}
         <div className="mb-8">
           <div className="flex items-center gap-2.5 mb-7">
-            <img src="/logo.png" alt="Nexus" className="w-8 h-8 shrink-0 rounded-lg object-cover" />
-            <span className="font-bold text-[17px] tracking-tight text-[var(--text-primary)]"
+            <img src="/logo.png" alt="Nexus" className="w-11 h-11 shrink-0 rounded-lg object-cover" />
+            <span className="font-bold text-[22px] tracking-tight text-[var(--text-primary)]"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Nexus
             </span>

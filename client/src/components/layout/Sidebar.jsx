@@ -39,8 +39,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="flex items-center justify-between px-5"
           style={{ height: 'var(--topbar-h)', minHeight: 'var(--topbar-h)' }}>
           <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Nexus" className="w-7 h-7 shrink-0 rounded-lg object-cover" />
-            <span className="font-bold text-[17px] tracking-tight text-[var(--text-primary)]"
+            <img src="/logo.png" alt="Nexus" className="w-9 h-9 shrink-0 rounded-lg object-cover" />
+            <span className="font-bold text-[19px] tracking-tight text-[var(--text-primary)]"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Nexus
             </span>

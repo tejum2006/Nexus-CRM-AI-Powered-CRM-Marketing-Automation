@@ -112,7 +112,7 @@ export default function Register() {
               src="/logo.png" 
               alt="Nexus" 
               style={{
-                width: '38px', height: '38px',
+                width: '48px', height: '48px',
                 borderRadius: '10px',
                 objectFit: 'cover',
                 boxShadow: '0 0 16px rgba(248,186,51,0.35), 0 2px 8px rgba(0,0,0,0.4)',
