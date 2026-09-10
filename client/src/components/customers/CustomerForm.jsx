@@ -57,12 +57,12 @@ const CustomerForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitt
 
   return (
     <>
-      <div className="modal-backdrop" onClick={onClose} />
+      <div className="modal-overlay" onClick={onClose} />
       
-      <div className="modal !fixed !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 !max-h-[90vh] !w-[95%] sm:!w-[600px] flex flex-col z-[100] p-0 shadow-2xl bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl overflow-hidden">
+      <div className="modal-content">
         
         {/* Header */}
-        <div className="px-6 py-5 border-b border-[var(--border)] flex items-center justify-between bg-[var(--bg-card)]">
+        <div className="modal-header">
           <h2 className="text-section text-[var(--text-primary)]">
             {initialData ? 'Edit Customer' : 'New Customer'}
           </h2>
@@ -75,25 +75,25 @@ const CustomerForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitt
         </div>
 
         {/* Form Body */}
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+        <div className="modal-body scrollbar-hide">
           <form id="customer-form" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
             
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="label">Full Name <span className="text-red-400">*</span></label>
-                <input type="text" className="input" placeholder="Jane Smith" {...register('name')} />
+                <input type="text" className="input" placeholder="Steve Rogers" {...register('name')} />
                 {errors.name && <p className="field-error">{errors.name.message}</p>}
               </div>
 
               <div className="col-span-2 sm:col-span-1">
                 <label className="label">Email <span className="text-red-400">*</span></label>
-                <input type="email" className="input" placeholder="jane@company.com" {...register('email')} />
+                <input type="email" className="input" placeholder="steve@company.com" {...register('email')} />
                 {errors.email && <p className="field-error">{errors.email.message}</p>}
               </div>
 
               <div className="col-span-2 sm:col-span-1">
                 <label className="label">Phone</label>
-                <input type="tel" className="input" placeholder="+1 (555) 000-0000" {...register('phone')} />
+                <input type="tel" className="input" placeholder="+91 98765 43210" {...register('phone')} />
                 {errors.phone && <p className="field-error">{errors.phone.message}</p>}
               </div>
 
@@ -109,7 +109,7 @@ const CustomerForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitt
 
               <div className="col-span-2">
                 <label className="label">Location</label>
-                <input type="text" className="input" placeholder="New York, NY" {...register('location')} />
+                <input type="text" className="input" placeholder="Mumbai, MH" {...register('location')} />
               </div>
 
               <div className="col-span-2">
@@ -155,7 +155,7 @@ const CustomerForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitt
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[var(--border)] bg-[var(--bg-card)] flex items-center justify-end gap-3">
+        <div className="modal-footer">
           <button 
             type="button" 
             onClick={onClose}

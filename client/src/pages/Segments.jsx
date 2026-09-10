@@ -68,97 +68,99 @@ const Segments = () => {
   };
 
   return (
-    <div className="page-full">
-      {/* Header */}
-      <div className="page-header shrink-0">
+    <div className="page-scroll">
+      {/* Page Header */}
+      <div className="page-header">
         <div>
-          <h1 className="text-display mb-1">Segments & Tags</h1>
+          <h1 className="heading-1 mb-1">Segments & Tags</h1>
           <p className="text-body">Manage audience segments and custom classification tags.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+      {/* Main Responsive Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.2fr)_minmax(280px,1fr)] gap-6 items-start">
 
         {/* Segments table */}
-        <div className="lg:col-span-2 card flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between p-5 border-b shrink-0"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-elevated)' }}>
+        <div className="card overflow-hidden">
+          <div className="flex items-center justify-between p-6 border-b border-[var(--border-subtle)] shrink-0">
             <div>
-              <h2 className="text-heading">Audience Segments</h2>
-              <p className="text-caption mt-0.5">Create distinct groups for targeted campaigns.</p>
+              <h2 className="heading-3 mb-0.5">Audience Segments</h2>
+              <p className="text-small">Create distinct groups for targeted marketing campaigns.</p>
             </div>
             <button
-              className="btn btn-primary"
+              className="btn btn-primary h-9 px-4 rounded-lg text-sm font-semibold shrink-0"
               onClick={() => { setEditingSegment(null); setIsFormOpen(true); }}
             >
-              <Plus size={14} /> New Segment
+              <Plus size={16} /> <span className="hidden sm:inline">New Segment</span>
             </button>
           </div>
 
-          <div className="flex-1 overflow-auto" style={{ background: 'var(--bg-base)' }}>
+          <div className="overflow-auto bg-[var(--bg-app)]">
             <div className="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Preview</th>
-                    <th>Type</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
+                    <th className="py-4 px-6 text-left">Segment</th>
+                    <th className="py-4 px-6 text-left">Color Label</th>
+                    <th className="py-4 px-6 text-left">Customers</th>
+                    <th className="py-4 px-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     Array.from({ length: 4 }).map((_, i) => (
                       <tr key={i}>
-                        <td><Skeleton className="w-28 h-3.5" /></td>
-                        <td><Skeleton className="w-20 h-5 rounded-full" /></td>
-                        <td><Skeleton className="w-14 h-4 rounded-full" /></td>
-                        <td style={{ textAlign: 'right' }}><Skeleton className="w-16 h-7 rounded-md ml-auto" /></td>
+                        <td className="py-5 px-6"><Skeleton className="w-32 h-5" /></td>
+                        <td className="py-5 px-6"><Skeleton className="w-24 h-6 rounded-full" /></td>
+                        <td className="py-5 px-6"><Skeleton className="w-12 h-5" /></td>
+                        <td className="py-5 px-6"><div className="flex justify-end"><Skeleton className="w-16 h-8 rounded-lg" /></div></td>
                       </tr>
                     ))
                   ) : segments.length === 0 ? (
                     <tr>
-                      <td colSpan="4">
-                        <div className="empty-state">
-                          <TagsIcon size={24} style={{ color: 'var(--text-faint)' }} />
-                          <p className="text-caption">No segments found.</p>
+                      <td colSpan="4" className="text-center py-16">
+                        <div className="flex flex-col items-center">
+                          <TagsIcon size={36} className="text-[var(--text-tertiary)] mb-3" />
+                          <p className="text-white font-bold text-lg">No segments found</p>
+                          <p className="text-sm text-[var(--text-secondary)] mt-1">Create a segment to organize your customers.</p>
                         </div>
                       </td>
                     </tr>
                   ) : (
                     segments.map(seg => (
-                      <tr key={seg._id} className="table-row group">
-                        <td>
-                          <span className="text-[13.5px] font-medium" style={{ color: 'var(--text-primary)' }}>
-                            {seg.name}
+                      <tr key={seg._id} className="hover:bg-[var(--bg-surface-hover)] transition-colors border-b border-[var(--border-subtle)]">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <span className="font-semibold text-white text-sm">{seg.name}</span>
+                            {seg.isDefault && (
+                              <span className="badge badge-neutral text-[10px] uppercase">System</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <SegmentBadge segment={seg} />
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="text-sm text-[var(--text-secondary)] font-semibold font-mono">
+                            {seg.customerCount || 0}
                           </span>
                         </td>
-                        <td>
-                          <SegmentBadge name={seg.name} color={seg.color} />
-                        </td>
-                        <td>
-                          {seg.isDefault ? (
-                            <span className="badge badge-neutral" style={{ fontSize: '11px' }}>System</span>
-                          ) : (
-                            <span className="badge badge-jade" style={{ fontSize: '11px' }}>Custom</span>
-                          )}
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => { setEditingSegment(seg); setIsFormOpen(true); }}
-                              className="btn btn-ghost h-7 w-7 p-0"
-                              title="Edit"
+                              className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-white hover:bg-white/10 transition-colors"
+                              title="Edit Segment"
                             >
-                              <Edit2 size={12} />
+                              <Edit2 size={16} />
                             </button>
                             {!seg.isDefault && (
                               <button
                                 onClick={() => handleDelete(seg)}
-                                className="btn btn-ghost h-7 w-7 p-0 hover:text-red-400"
-                                title="Delete"
+                                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--status-error)] hover:bg-[var(--status-error)]/10 transition-colors"
+                                title="Delete Segment"
                               >
-                                <Trash2 size={12} />
+                                <Trash2 size={16} />
                               </button>
                             )}
                           </div>
@@ -172,40 +174,44 @@ const Segments = () => {
           </div>
         </div>
 
-        {/* Tag Cloud */}
-        <div className="card flex flex-col overflow-hidden">
-          <div className="p-5 border-b shrink-0"
-            style={{ borderColor: 'var(--border)', background: 'var(--bg-elevated)' }}>
-            <h2 className="text-heading flex items-center gap-2">
-              <Hash size={15} style={{ color: 'var(--text-muted)' }} />
-              Tag Cloud
-            </h2>
-            <p className="text-caption mt-1">All tags in use across your customers.</p>
+        {/* Tags List */}
+        <div className="card p-6 space-y-5">
+          <div className="pb-4 border-b border-[var(--border-subtle)]">
+            <h2 className="heading-3 mb-0.5">Active Tags</h2>
+            <p className="text-small">Tags used across your customers.</p>
           </div>
-          <div className="flex-1 overflow-auto p-5">
+          
+          <div>
             {loading ? (
-              <div className="flex flex-wrap gap-2">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <Skeleton key={i} className="w-16 h-6 rounded-full" />
-                ))}
+              <div className="flex flex-wrap gap-2.5 py-2">
+                {[1,2,3,4,5,6].map(i => <Skeleton key={i} className="w-20 h-8 rounded-full" />)}
               </div>
             ) : tags.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-                <Hash size={24} style={{ color: 'var(--text-faint)', marginBottom: '8px' }} />
-                <p className="text-caption">No tags in use yet.</p>
+               <div className="flex flex-col items-center justify-center py-10 text-[var(--text-tertiary)]">
+                <Hash size={28} className="mb-3 opacity-50" />
+                <p className="text-sm font-medium">No tags created yet.</p>
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {tags.map((tag, i) => <TagChip key={i} name={tag} />)}
+                {tags.map(tag => (
+                  <TagChip key={tag} tag={tag} />
+                ))}
               </div>
             )}
+            
+            <div className="mt-8 p-4 bg-[var(--bg-surface-hover)] rounded-lg">
+               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                 <strong className="text-[var(--text-primary)]">Tip:</strong> Tags are created dynamically when you add them to a customer profile. They are automatically removed when no longer associated with any customer.
+               </p>
+            </div>
           </div>
         </div>
+
       </div>
 
       <SegmentForm
         isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
+        onClose={() => { setIsFormOpen(false); setEditingSegment(null); }}
         onSubmit={handleSubmit}
         initialData={editingSegment}
         isSubmitting={isSubmitting}

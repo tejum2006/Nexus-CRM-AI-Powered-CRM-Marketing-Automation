@@ -1,128 +1,403 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, Tags, Megaphone, Sparkles,
-  Settings, X, Hexagon, ChevronRight, Users2
+  LayoutDashboard,
+  Users,
+  Tags,
+  Megaphone,
+  Sparkles,
+  Settings,
+  X,
+  ShieldCheck,
+  LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
+  const { user, logout } = useAuth();
+  const location = useLocation();
 
   const navItems = [
-    { name: 'Dashboard',      path: '/dashboard',     icon: LayoutDashboard },
-    { name: 'Customers',      path: '/customers',     icon: Users },
-    { name: 'Segments & Tags',path: '/segments',      icon: Tags },
-    { name: 'Campaigns',      path: '/campaigns',     icon: Megaphone },
+    {
+      name: 'Dashboard',
+      path: '/dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      name: 'Customers',
+      path: '/customers',
+      icon: Users,
+    },
+    {
+      name: 'Segments & Tags',
+      path: '/segments',
+      icon: Tags,
+    },
+    {
+      name: 'Campaigns',
+      path: '/campaigns',
+      icon: Megaphone,
+    },
   ];
 
   if (user?.role === 'Admin' || user?.role === 'Marketing Manager') {
-    navItems.push({ name: 'AI Generator', path: '/ai-generator', icon: Sparkles });
+    navItems.push({
+      name: 'AI Generator',
+      path: '/ai-generator',
+      icon: Sparkles,
+    });
   }
 
+  const bottomItems = [
+    {
+      name: 'Team',
+      path: '/team',
+      icon: ShieldCheck,
+      adminOnly: true,
+    },
+    {
+      name: 'Settings',
+      path: '/settings',
+      icon: Settings,
+      adminOnly: false,
+    },
+  ];
+
   const handleNav = () => {
-    if (window.innerWidth <= 1024) toggleSidebar();
+    if (window.innerWidth <= 1024) {
+      toggleMobileSidebar();
+    }
   };
 
+  const getNavClass = (path) => {
+    const isActive = location.pathname.startsWith(path);
+
+    return `
+      group
+      flex items-center
+      w-full
+      gap-3
+      rounded-lg
+      text-base font-medium
+      transition-all duration-200
+      ${isActive
+        ? `
+            bg-[var(--brand-ai-glow)]
+            text-[var(--brand-primary)]
+          `
+        : `
+            text-[var(--text-secondary)]
+            hover:bg-[var(--bg-surface-hover)]
+            hover:text-white
+          `
+      }
+    `;
+  };
+
+  const navStyle = { padding: '12px 16px' };
+
   return (
-    <>
-      {/* Mobile overlay */}
+    <aside
+      className={`
+        fixed lg:static
+        inset-y-0 left-0
+        z-50
+
+        flex flex-col
+        shrink-0
+
+        w-[240px]
+        h-screen
+
+        bg-[var(--bg-app)]
+        border-r border-[var(--border-subtle)]
+
+        transition-transform duration-300 ease-in-out
+
+        ${isMobileOpen
+          ? 'translate-x-0'
+          : '-translate-x-full lg:translate-x-0'
+        }
+      `}
+    >
+      {/* =========================================================
+          BRAND HEADER
+      ========================================================== */}
       <div
-        className={`sidebar-overlay ${isOpen ? 'visible' : ''}`}
-        onClick={toggleSidebar}
-      />
+        className="
+          h-[var(--header-height)]
+          min-h-[64px]
 
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+          flex items-center justify-between
 
-        {/* Logo */}
-        <div className="flex items-center justify-between px-5"
-          style={{ height: 'var(--topbar-h)', minHeight: 'var(--topbar-h)' }}>
-          <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Nexus" className="w-9 h-9 shrink-0 rounded-lg object-cover" />
-            <span className="font-bold text-[19px] tracking-tight text-[var(--text-primary)]"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              Nexus
+          px-5
+
+          shrink-0
+
+          border-b
+          border-[var(--border-subtle)]
+          lg:border-transparent
+        "
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Logo */}
+          <div
+            className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl overflow-hidden shadow-lg border border-[var(--border-subtle)]"
+          >
+            <img src="/logo.png" alt="Nexus Logo" className="w-full h-full object-cover" />
+          </div>
+
+          {/* Brand */}
+          <div className="flex flex-col justify-center min-w-0">
+            <span
+              style={{ fontFamily: 'Michroma, sans-serif' }}
+              className="
+                text-lg
+                leading-none
+                text-white
+                whitespace-nowrap
+                tracking-wide
+              "
+            >
+              NEXUS
+            </span>
+
+            <span
+              className="
+                mt-1
+                text-[var(--brand-primary)]
+                text-[10px]
+                uppercase
+                tracking-[0.2em]
+                font-sans
+                font-bold
+                leading-none
+                whitespace-nowrap
+              "
+            >
+              CRM
             </span>
           </div>
-          <button
-            className="show-mobile p-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors"
-            onClick={toggleSidebar}
-            aria-label="Close sidebar"
-          >
-            <X size={16} />
-          </button>
         </div>
 
-        {/* Nav */}
-        <div className="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
-          <p className="text-label px-3 mb-2">Menu</p>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.name}
-              to={item.path}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-              onClick={handleNav}
-            >
-              <item.icon size={15} className="nav-icon shrink-0 opacity-80" />
-              {item.name}
-            </NavLink>
-          ))}
-        </div>
+        {/* Mobile Close */}
+        <button
+          type="button"
+          aria-label="Close navigation"
+          className="
+            lg:hidden
 
-        {/* Bottom: admin + profile */}
-        <div>
+            flex items-center justify-center
 
-          {/* Admin links */}
-          {user?.role === 'Admin' && (
-            <div className="px-3 pt-3 pb-1 space-y-0.5">
+            w-8 h-8
+
+            rounded-lg
+
+            text-[var(--text-secondary)]
+
+            hover:text-white
+            hover:bg-[var(--bg-surface-hover)]
+
+            transition-colors
+          "
+          onClick={toggleMobileSidebar}
+        >
+          <X size={18} strokeWidth={2} />
+        </button>
+      </div>
+
+      {/* =========================================================
+          MAIN NAVIGATION
+      ========================================================== */}
+      <div
+        className="
+          flex-1
+          min-h-0
+
+          overflow-y-auto
+
+          px-3
+          py-5
+        "
+      >
+        <nav className="flex flex-col gap-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+
+            return (
               <NavLink
-                to="/team"
-                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                key={item.name}
+                to={item.path}
                 onClick={handleNav}
+                className={getNavClass(item.path)}
+                style={navStyle}
               >
-                <Users2 size={15} className="nav-icon shrink-0 opacity-80" />
-                Team
-              </NavLink>
-              <NavLink
-                to="/settings"
-                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                onClick={handleNav}
-              >
-                <Settings size={15} className="nav-icon shrink-0 opacity-80" />
-                Settings
-              </NavLink>
-            </div>
-          )}
+                <Icon
+                  size={25}
+                  strokeWidth={2}
+                  className="
+                    shrink-0
+                    transition-transform duration-200
+                    group-hover:scale-[1.03]
+                  "
+                />
 
-          {/* User Profile */}
+                <span className="truncate">
+                  {item.name}
+                </span>
+              </NavLink>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* =========================================================
+          BOTTOM SECTION
+      ========================================================== */}
+      <div
+        className="
+          shrink-0
+
+          px-3
+          pt-5
+          pb-4
+        "
+      >
+        {/* Bottom Navigation */}
+        <nav className="flex flex-col gap-1.5 mb-5">
+          {bottomItems.map((item) => {
+            if (item.adminOnly && user?.role !== 'Admin') {
+              return null;
+            }
+
+            const Icon = item.icon;
+
+            return (
+              <NavLink
+                key={item.name}
+                to={item.path}
+                onClick={handleNav}
+                className={getNavClass(item.path)}
+                style={navStyle}
+              >
+                <Icon
+                  size={25}
+                  strokeWidth={2}
+                  className="shrink-0"
+                />
+
+                <span className="truncate">
+                  {item.name}
+                </span>
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        {/* =======================================================
+            USER PROFILE
+        ======================================================== */}
+        <div
+          className="
+            pt-4
+
+            border-t
+            border-[var(--border-subtle)]
+          "
+        >
           <div
-            className="flex items-center gap-3 px-4 py-4 cursor-pointer hover:bg-[var(--bg-hover)] transition-colors group"
-            onClick={() => { navigate('/settings'); handleNav(); }}
-            role="button"
-            tabIndex={0}
+            className="
+              flex items-center
+
+              gap-3
+
+              px-2.5
+              py-2
+
+              rounded-lg
+
+              min-w-0
+            "
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[13px] font-semibold"
-              style={{
-                background: 'var(--gold-dim)',
-                color: 'var(--gold-light)',
-              }}>
+            {/* Avatar */}
+            <div
+              className="
+                w-9 h-9
+                shrink-0
+
+                flex items-center justify-center
+
+                rounded-full
+
+                bg-[var(--bg-surface-hover)]
+
+                border
+                border-[var(--border-strong)]
+
+                text-[var(--text-secondary)]
+
+                font-semibold
+                text-xs
+              "
+            >
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
-            <div className="overflow-hidden flex-1 min-w-0">
-              <p className="text-[13.5px] font-medium text-[var(--text-primary)] truncate leading-tight">
+
+            {/* User info */}
+            <div className="flex-1 min-w-0">
+              <p
+                className="
+                  text-sm
+                  font-medium
+                  text-white
+                  truncate
+                "
+              >
                 {user?.name || 'User'}
               </p>
-              <p className="text-[11.5px] text-[var(--text-muted)] truncate leading-tight mt-0.5">
+
+              <p
+                className="
+                  mt-0.5
+
+                  text-xs
+                  text-[var(--text-tertiary)]
+
+                  truncate
+                "
+              >
                 {user?.role || 'Member'}
               </p>
             </div>
-            <ChevronRight size={14} className="text-[var(--text-faint)] group-hover:text-[var(--text-muted)] transition-colors shrink-0" />
+
+            {/* Logout */}
+            <button
+              type="button"
+              onClick={logout}
+              title="Sign Out"
+              aria-label="Sign Out"
+              className="
+                w-8 h-8
+                shrink-0
+
+                flex items-center justify-center
+
+                rounded-lg
+
+                text-[var(--text-tertiary)]
+
+                hover:text-[var(--status-error)]
+                hover:bg-[var(--bg-surface-hover)]
+
+                transition-colors
+              "
+            >
+              <LogOut size={16} strokeWidth={2} />
+            </button>
           </div>
         </div>
-
-      </aside>
-    </>
+      </div>
+    </aside>
   );
 };
 

@@ -18,6 +18,7 @@ const TONES = ['Professional', 'Casual', 'Urgent', 'Friendly', 'Humorous', 'Luxu
 
 const AIGenerator = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [output, setOutput] = useState('');
   const [copied, setCopied] = useState(false);
@@ -73,7 +74,6 @@ const AIGenerator = () => {
 
   const handleCreateCampaign = () => {
     if (!output) return;
-    // We pass the generated content and context to the Campaign Builder via state
     const currentValues = watch();
     navigate('/campaigns/new', { 
       state: { 
@@ -90,88 +90,93 @@ const AIGenerator = () => {
   };
 
   return (
-    <div className="page-enter flex flex-col h-full min-h-0">
+    <div className="page-scroll flex flex-col h-[calc(100vh-var(--header-height))]">
       
       {/* Header */}
       <div className="page-header shrink-0 flex items-center justify-between">
         <div>
-          <h1 className="text-display flex items-center gap-2 mb-1">
-            <Sparkles size={24} className="text-[var(--gold)]" />
-            AI Generator Workspace
+          <h1 className="heading-1 flex items-center gap-2 mb-1">
+            <Sparkles size={24} className="text-[var(--brand-ai)]" />
+            AI Generator
           </h1>
-          <p className="text-body">A dedicated sandbox to brainstorm, test prompts, and generate marketing copy.</p>
+          <p className="text-body">Draft high-converting campaigns instantly with Nexus AI.</p>
         </div>
       </div>
 
-      {/* Split Pane Workspace */}
-      <div className="grid lg:grid-cols-[minmax(360px,0.8fr)_minmax(500px,1.2fr)] flex-1 min-h-0 px-4 sm:px-6 lg:px-8 pb-6 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 overflow-y-auto pb-6">
         
-        {/* Left Pane: Controls */}
-        <div className="flex flex-col h-full min-h-[500px]">
-          <div className="card flex flex-col h-full overflow-hidden border-t-4 border-t-[var(--gold)]">
-            <div className="p-5 border-b border-[var(--border)] bg-[var(--bg-elevated)] shrink-0">
-               <h2 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
-                 <Wand2 size={16} className="text-[var(--text-muted)]" />
-                 Generation Parameters
-               </h2>
+        {/* Left Column: Inputs */}
+        <div className="flex flex-col gap-6">
+          
+          <div className="card" style={{ padding: '28px' }}>
+            <h3 className="heading-3 mb-4">Quick Templates</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {TEMPLATES.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => handleTemplateClick(t.prompt)}
+                  className="flex items-start gap-3 p-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--bg-surface-hover)] transition-colors text-left"
+                >
+                  <t.icon size={16} className="text-[var(--text-secondary)] mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">{t.label}</p>
+                    <p className="text-xs text-[var(--text-tertiary)] line-clamp-2">{t.prompt}</p>
+                  </div>
+                </button>
+              ))}
             </div>
-            
-            <div className="flex-1 overflow-auto p-5 bg-[var(--bg-card)] space-y-6">
+          </div>
+
+          <div className="card" style={{ padding: '28px', flex: 1 }}>
+            <form onSubmit={handleSubmit(handleGenerate)} style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%' }}>
               
-              <form id="ai-form" onSubmit={handleSubmit(handleGenerate)} className="space-y-5">
-                
-                {/* Prompt & Templates */}
+              <div className="flex-1">
+                <label className="label flex items-center justify-between">
+                  <span>What do you want to write? <span className="text-[var(--status-error)]">*</span></span>
+                  <Wand2 size={14} className="text-[var(--brand-ai)]" />
+                </label>
+                <textarea
+                  className="input"
+                  style={{ paddingTop: '12px', paddingBottom: '12px', minHeight: '140px', resize: 'vertical', lineHeight: '1.6', width: '100%' }}
+                  placeholder="e.g., Write a promotional email for our new summer collection targeting VIP customers..."
+                  {...register('prompt')}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="label">What should the AI write about?</label>
-                  <textarea 
-                    className="input w-full min-h-[120px] resize-y text-[13px]" 
-                    placeholder="e.g. Write a catchy email introducing our new Fall collection..."
-                    {...register('prompt')}
-                  />
-                  
-                  <div className="mt-3">
-                    <p className="text-[11px] text-[var(--text-muted)] mb-2 uppercase tracking-wider font-semibold">Quick Start Templates</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {TEMPLATES.map(t => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => handleTemplateClick(t.prompt)}
-                          className="flex items-center gap-2 p-2 text-left bg-[var(--bg-input)] border border-[var(--border)] rounded-md hover:border-[var(--gold-border)] hover:bg-[rgba(248,186,51,0.05)] transition-all group"
-                        >
-                          <t.icon size={14} className="text-[var(--text-muted)] group-hover:text-[var(--gold)]" />
-                          <span className="text-[12px] font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">{t.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <label className="label">Format</label>
+                  <select
+                    className="input"
+                    style={{ background: 'rgba(10,15,28,0.6)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                    {...register('type')}
+                  >
+                    <option value="Email" style={{ background: '#111827' }}>Email</option>
+                    <option value="SMS" style={{ background: '#111827' }}>SMS</option>
+                  </select>
                 </div>
-
-                {/* Tone & Type */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="label">Format</label>
-                    <select className="input text-[13px]" {...register('type')}>
-                      <option value="Email">Email</option>
-                      <option value="SMS">SMS</option>
-                      <option value="Ad Copy">Ad Copy</option>
-                      <option value="Social Post">Social Post</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="label">Tone of Voice</label>
-                    <select className="input text-[13px]" {...register('tone')}>
-                      {TONES.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </div>
+                <div>
+                  <label className="label">Tone</label>
+                  <select
+                    className="input"
+                    style={{ background: 'rgba(10,15,28,0.6)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                    {...register('tone')}
+                  >
+                    {TONES.map(t => <option key={t} value={t} style={{ background: '#111827' }}>{t}</option>)}
+                  </select>
                 </div>
+              </div>
 
-                {/* Target Audience Context */}
-                <div className="pt-4 border-t border-[var(--border)] space-y-4">
-                  <h3 className="text-[12px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">Audience Context (Optional)</h3>
-                  
+              <div className="bg-[var(--bg-app)] p-5 rounded-lg border border-[var(--border-subtle)] space-y-4">
+                <div>
+                  <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Context (Optional)</h4>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Select segments or tags. The AI will tailor the messaging to this specific audience.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <label className="label mb-1">Target Segments</label>
+                    <label className="label">Segments</label>
                     <Controller
                       name="targetSegments"
                       control={control}
@@ -180,9 +185,8 @@ const AIGenerator = () => {
                       )}
                     />
                   </div>
-                  
                   <div>
-                    <label className="label mb-1">Target Tags</label>
+                    <label className="label">Tags</label>
                     <Controller
                       name="targetTags"
                       control={control}
@@ -192,80 +196,74 @@ const AIGenerator = () => {
                     />
                   </div>
                 </div>
+              </div>
 
-              </form>
-            </div>
-            
-            <div className="p-4 border-t border-[var(--border)] bg-[var(--bg-elevated)] shrink-0">
-               <button 
-                  type="submit" 
-                  form="ai-form"
-                  disabled={isGenerating}
-                  className="btn btn-primary w-full text-[14px] py-2.5 shadow-lg shadow-[rgba(248,186,51,0.15)]"
-                >
-                  {isGenerating ? (
-                    <span className="flex items-center gap-2">
-                      <Sparkles className="animate-spin" size={16} /> Generating...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <Sparkles size={16} /> Generate Copy
-                    </span>
-                  )}
-                </button>
-            </div>
+              <button
+                type="submit"
+                disabled={isGenerating || !watch('prompt')}
+                className="w-full btn btn-primary"
+                style={{ marginTop: 'auto', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                {isGenerating ? (
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" /> Generating...</>
+                ) : (
+                  <><Sparkles size={16} className="mr-2" /> Generate Content</>
+                )}
+              </button>
+
+            </form>
           </div>
         </div>
 
-        {/* Right Pane: Output Workspace */}
-        <div className="flex flex-col h-full min-h-[500px]">
-          <div className="card flex flex-col h-full overflow-hidden shadow-2xl relative">
-            
-            <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-elevated)] flex justify-between items-center shrink-0">
-               <h2 className="text-[13px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">Output Workspace</h2>
-               
-               {output && (
-                 <div className="flex items-center gap-2">
-                   <button 
-                     onClick={handleCopy}
-                     className="btn bg-transparent border border-[var(--border)] hover:bg-[var(--bg-input)] text-[12px] px-3 py-1.5"
-                   >
-                     {copied ? <CheckCircle2 size={14} className="text-green-400 mr-1.5" /> : <Copy size={14} className="text-[var(--text-muted)] mr-1.5" />}
-                     {copied ? 'Copied!' : 'Copy'}
-                   </button>
-                   <button 
-                     onClick={handleCreateCampaign}
-                     className="btn bg-[var(--gold-dim)] border border-[var(--gold-border)] text-[var(--gold-light)] hover:text-[var(--gold)] text-[12px] px-3 py-1.5 transition-colors group"
-                   >
-                     Create Campaign <ArrowRight size={14} className="ml-1.5 group-hover:translate-x-0.5 transition-transform" />
-                   </button>
-                 </div>
-               )}
+        {/* Right Column: Output */}
+        <div className="flex flex-col gap-6">
+          <div className="card flex flex-col h-full min-h-[500px]">
+            <div className="px-6 py-5 border-b border-[var(--border-subtle)] flex items-center justify-between shrink-0">
+              <h2 className="heading-3 mb-0">Generated Content</h2>
+              {output && (
+                <button 
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition-colors p-1.5 rounded-md hover:bg-[var(--bg-surface-hover)]"
+                >
+                  {copied ? <CheckCircle2 size={14} className="text-[var(--status-success)]" /> : <Copy size={14} />}
+                  {copied ? 'Copied!' : 'Copy text'}
+                </button>
+              )}
             </div>
 
-            <div className="flex-1 p-6 overflow-auto bg-[var(--bg-base)] relative">
-               {isGenerating ? (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--bg-base)] z-10 animate-pulse">
-                    <div className="w-16 h-16 rounded-full border-4 border-[var(--bg-input)] border-t-[var(--gold)] animate-spin mb-4" />
-                    <p className="text-[var(--gold)] font-medium tracking-wider text-sm">Gemini is writing...</p>
-                 </div>
-               ) : output ? (
-                 <div className="prose prose-invert max-w-none">
-                   <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--text-primary)] font-medium">
-                     {output}
-                   </p>
-                 </div>
-               ) : (
-                 <div className="h-full flex flex-col items-center justify-center text-center">
-                    <div className="opacity-40 flex flex-col items-center">
-                      <Sparkles size={48} className="mb-4 text-[var(--text-muted)]" />
-                      <p className="text-[15px] text-[var(--text-secondary)] font-medium">Your generated content will appear here.</p>
-                      <p className="text-[13px] text-[var(--text-muted)] mt-2 max-w-sm">Use the controls on the left to set up your prompt and target audience context.</p>
-                    </div>
-                 </div>
-               )}
+            <div className="flex-1 p-6 overflow-y-auto bg-[var(--bg-app)]">
+              {!output && !isGenerating ? (
+                <div className="h-full flex flex-col items-center justify-center text-[var(--text-tertiary)]">
+                  <Wand2 size={40} className="mb-4 opacity-30" />
+                  <p className="text-sm font-medium text-[var(--text-primary)]">Your generated content will appear here.</p>
+                  <p className="text-xs mt-1 text-center max-w-xs text-[var(--text-secondary)]">Fill out the prompt on the left and click Generate to see the magic happen.</p>
+                </div>
+              ) : isGenerating ? (
+                <div className="h-full flex flex-col items-center justify-center text-[var(--brand-ai)]">
+                  <div className="relative w-16 h-16 mb-4">
+                    <div className="absolute inset-0 border-4 border-[var(--brand-ai)]/20 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-[var(--brand-ai)] border-t-transparent rounded-full animate-spin"></div>
+                    <Sparkles size={20} className="absolute inset-0 m-auto animate-pulse" />
+                  </div>
+                  <p className="text-sm font-medium animate-pulse text-[var(--text-secondary)]">Nexus AI is thinking...</p>
+                </div>
+              ) : (
+                <div className="prose prose-invert max-w-none text-sm text-[var(--text-primary)] whitespace-pre-wrap leading-relaxed">
+                  {output}
+                </div>
+              )}
             </div>
 
+            {output && (
+              <div className="p-6 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] shrink-0">
+                <button 
+                  onClick={handleCreateCampaign}
+                  className="w-full btn bg-[var(--brand-premium)] hover:bg-[var(--brand-premium)]/90 text-white"
+                >
+                  Use in New Campaign <ArrowRight size={16} className="ml-2" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

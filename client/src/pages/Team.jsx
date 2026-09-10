@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserPlus, Shield, Trash2 } from 'lucide-react';
+import { Users, UserPlus, Shield, Trash2, Mail, Calendar } from 'lucide-react';
 import InviteMemberModal from '../components/team/InviteMemberModal';
 import Skeleton from '../components/ui/Skeleton';
 import * as teamService from '../services/teamService';
@@ -8,7 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const Team = () => {
   const { user } = useAuth();
-  const { addToast } = useToast();
+  const { toast } = useToast();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -21,7 +21,7 @@ const Team = () => {
       const data = await teamService.getTeamMembers();
       if (data.success) setMembers(data.data);
     } catch {
-      addToast('Failed to fetch team members', 'error');
+      toast.error('Failed to fetch team members');
     } finally {
       setLoading(false);
     }
@@ -31,12 +31,12 @@ const Team = () => {
     try {
       const res = await teamService.inviteTeamMember(userData);
       if (res.success) {
-        addToast('Team member invited successfully', 'success');
+        toast.success('Team member invited successfully');
         setMembers(prev => [...prev, res.data]);
         setIsInviteModalOpen(false);
       }
     } catch (error) {
-      addToast(error.response?.data?.error || 'Failed to invite member', 'error');
+      toast.error(error.response?.data?.error || 'Failed to invite member');
     }
   };
 
@@ -45,10 +45,10 @@ const Team = () => {
       const res = await teamService.updateTeamMemberRole(id, newRole);
       if (res.success) {
         setMembers(prev => prev.map(m => m._id === id ? res.data : m));
-        addToast('Role updated', 'success');
+        toast.success('Role updated');
       }
     } catch {
-      addToast('Failed to update role', 'error');
+      toast.error('Failed to update role');
     }
   };
 
@@ -58,144 +58,121 @@ const Team = () => {
       const res = await teamService.removeTeamMember(id);
       if (res.success) {
         setMembers(prev => prev.filter(m => m._id !== id));
-        addToast('Member removed', 'success');
+        toast.success('Member removed');
       }
     } catch (error) {
-      addToast(error.response?.data?.error || 'Failed to remove member', 'error');
+      toast.error(error.response?.data?.error || 'Failed to remove member');
     }
   };
 
   return (
-    <div className="page-enter">
+    <div className="page-scroll flex flex-col h-[calc(100vh-var(--header-height))]">
       {/* Header */}
-      <div className="page-header">
+      <div className="page-header shrink-0 flex items-center justify-between">
         <div>
-          <h1 className="text-display mb-1">Team</h1>
+          <h1 className="heading-1 mb-1">Team</h1>
           <p className="text-body">Manage members and access controls.</p>
         </div>
-        <div className="page-header-actions">
+        <div className="flex items-center gap-3">
           <button className="btn btn-primary" onClick={() => setIsInviteModalOpen(true)}>
-            <UserPlus size={14} />
-            Invite Member
+            <UserPlus size={16} />
+            <span className="hidden sm:inline">Invite Member</span>
           </button>
         </div>
       </div>
 
       {/* Table */}
-      <div className="card overflow-hidden">
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Member</th>
-                <th>Role</th>
-                <th>Joined</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i}>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="w-8 h-8 rounded-full" />
-                        <div>
-                          <Skeleton className="w-28 h-3.5 mb-1.5" />
-                          <Skeleton className="w-36 h-3" />
-                        </div>
-                      </div>
-                    </td>
-                    <td><Skeleton className="w-24 h-3.5" /></td>
-                    <td><Skeleton className="w-20 h-3.5" /></td>
-                    <td style={{ textAlign: 'right' }}><Skeleton className="w-8 h-8 rounded-md ml-auto" /></td>
-                  </tr>
-                ))
-              ) : members.length === 0 ? (
+      <div className="card flex flex-col flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 overflow-auto bg-[var(--bg-app)]">
+          <div className="table-container">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="4">
-                    <div className="empty-state">
-                      <Users size={28} style={{ color: 'var(--text-faint)' }} />
-                      <p className="text-heading">No team members yet</p>
-                      <p className="text-caption">Invite your first member to get started.</p>
-                    </div>
-                  </td>
+                  <th className="py-3 px-6 text-left">Member</th>
+                  <th className="py-3 px-6 text-left">Role</th>
+                  <th className="py-3 px-6 text-left">Joined</th>
+                  <th className="py-3 px-6 text-right">Actions</th>
                 </tr>
-              ) : (
-                members.map(member => (
-                  <tr key={member._id} className="table-row">
-                    {/* Member */}
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold shrink-0"
-                          style={{
-                            background: 'var(--bg-active)',
-                            border: '1px solid var(--border)',
-                            color: 'var(--text-primary)',
-                          }}>
-                          {member.name.charAt(0).toUpperCase()}
+              </thead>
+              <tbody>
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <tr key={i}>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="w-10 h-10 rounded-full" />
+                          <div>
+                            <Skeleton className="w-32 h-4 mb-1.5" />
+                            <Skeleton className="w-48 h-3" />
+                          </div>
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[13.5px] font-medium" style={{ color: 'var(--text-primary)' }}>
-                              {member.name}
+                      </td>
+                      <td className="py-4 px-6"><Skeleton className="w-32 h-8 rounded-lg" /></td>
+                      <td className="py-4 px-6"><Skeleton className="w-24 h-4" /></td>
+                      <td className="py-4 px-6"><div className="flex justify-end"><Skeleton className="w-16 h-8 rounded-lg" /></div></td>
+                    </tr>
+                  ))
+                ) : (
+                  members.map(member => (
+                    <tr key={member._id} className="hover:bg-[var(--bg-surface-hover)] transition-colors border-b border-[var(--border-subtle)]">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-[var(--brand-primary)]/10 flex items-center justify-center shrink-0">
+                            <span className="text-sm font-bold text-[var(--brand-primary)]">
+                              {member.name.charAt(0).toUpperCase()}
                             </span>
-                            {member._id === user?._id && (
-                              <span className="badge badge-gold" style={{ fontSize: '10px', padding: '1px 7px' }}>You</span>
-                            )}
                           </div>
-                          <div className="text-[12px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                            {member.email}
+                          <div>
+                            <p className="text-sm font-semibold text-white flex items-center gap-2">
+                              {member.name}
+                              {member._id === user?._id && (
+                                <span className="badge badge-success text-[10px] uppercase">
+                                  You
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-xs text-[var(--text-secondary)] mt-0.5 flex items-center gap-1.5">
+                              <Mail size={12} /> {member.email}
+                            </p>
                           </div>
                         </div>
-                      </div>
-                    </td>
-
-                    {/* Role */}
-                    <td>
-                      <div className="flex items-center gap-1.5">
-                        {member.role === 'Admin' && (
-                          <Shield size={12} style={{ color: 'var(--gold)' }} />
-                        )}
+                      </td>
+                      <td className="py-4 px-6">
                         <select
-                          className="text-[13px] bg-transparent border-none outline-none cursor-pointer"
-                          style={{ color: 'var(--text-primary)' }}
+                          className="input !h-9 !py-0 !text-xs w-48"
                           value={member.role}
                           onChange={(e) => handleRoleChange(member._id, e.target.value)}
-                          disabled={member._id === user?._id}
+                          disabled={member._id === user?._id || user?.role !== 'Admin'}
                         >
-                          <option value="Admin">Admin</option>
-                          <option value="Marketing Manager">Marketing Manager</option>
                           <option value="Sales Executive">Sales Executive</option>
+                          <option value="Marketing Manager">Marketing Manager</option>
+                          <option value="Admin">Admin</option>
                         </select>
-                      </div>
-                    </td>
-
-                    {/* Joined */}
-                    <td>
-                      <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                        {new Date(member.createdAt).toLocaleDateString(undefined, {
-                          month: 'short', day: 'numeric', year: 'numeric'
-                        })}
-                      </span>
-                    </td>
-
-                    {/* Actions */}
-                    <td style={{ textAlign: 'right' }}>
-                      <button
-                        onClick={() => handleRemove(member._id)}
-                        disabled={member._id === user?._id}
-                        className="btn btn-ghost h-8 w-8 p-0 hover:text-red-400 disabled:opacity-30"
-                        title="Remove member"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)] font-medium">
+                          <Calendar size={14} className="text-[var(--text-tertiary)]" />
+                          {new Date(member.createdAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => handleRemove(member._id)}
+                            disabled={member._id === user?._id || user?.role !== 'Admin'}
+                            className="btn btn-danger !h-8 !px-3"
+                            title={member._id === user?._id ? "You cannot remove yourself" : "Remove member"}
+                          >
+                            <Trash2 size={14} /> Remove
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

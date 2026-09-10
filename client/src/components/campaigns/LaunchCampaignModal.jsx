@@ -42,7 +42,7 @@ const LaunchCampaignModal = ({ isOpen, onClose, campaign, onLaunchSuccess }) => 
         </div>
 
         <div className="p-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-[var(--accent-primary)]/20 flex items-center justify-center text-[var(--accent-primary)] mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full bg-[var(--brand-primary)]/20 flex items-center justify-center text-[var(--brand-primary)] mx-auto mb-4">
             <Send className="w-8 h-8 ml-1" />
           </div>
           
@@ -72,7 +72,7 @@ const LaunchCampaignModal = ({ isOpen, onClose, campaign, onLaunchSuccess }) => 
           <button
             onClick={handleLaunch}
             disabled={isLaunching}
-            className="px-4 py-2 bg-[var(--accent-primary)] text-white rounded-md hover:bg-[var(--accent-hover)] transition-colors font-medium shadow-[0_0_15px_rgba(var(--accent-primary-rgb),0.3)] disabled:opacity-50 flex items-center"
+            className="px-4 py-2 bg-[var(--brand-primary)] text-white rounded-md hover:bg-[var(--brand-primary-hover)] transition-colors font-medium shadow-[0_0_15px_rgba(var(--brand-primary-rgb),0.3)] disabled:opacity-50 flex items-center"
           >
             {isLaunching ? (
               <>

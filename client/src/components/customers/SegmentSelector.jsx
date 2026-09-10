@@ -41,69 +41,108 @@ const SegmentSelector = ({ value = [], onChange, className = '' }) => {
     onChange(newValues);
   };
 
-  const filteredSegments = segments.filter(seg => 
+  const filteredSegments = segments.filter(seg =>
     seg.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className={`relative ${className}`} ref={wrapperRef}>
-      <div 
-        className="input min-h-[40px] h-auto flex flex-wrap gap-2 items-center cursor-pointer p-2"
+    <div className={`relative ${className}`} ref={wrapperRef} style={{ zIndex: isOpen ? 100 : 'auto' }}>
+      <div
+        className="input"
+        style={{
+          minHeight: '40px',
+          height: 'auto',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '6px',
+          alignItems: 'center',
+          cursor: 'pointer',
+          padding: '6px 10px',
+        }}
         onClick={() => setIsOpen(!isOpen)}
       >
         {value.length === 0 && (
-          <span className="text-[var(--text-muted)] text-[14px] px-1">Select segments...</span>
+          <span style={{ color: 'var(--text-tertiary)', fontSize: '14px', paddingLeft: '2px' }}>Select segments...</span>
         )}
-        
+
         {value.map(val => {
           const segData = segments.find(s => s.name === val) || { name: val, color: '#9ca3af' };
           return (
             <div key={val} className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
               <SegmentBadge name={segData.name} color={segData.color} />
-              <button 
+              <button
                 type="button"
                 onClick={() => toggleSegment(val)}
-                className="text-[var(--text-muted)] hover:text-red-400 focus:outline-none"
+                style={{ color: 'var(--text-tertiary)' }}
+                className="hover:text-red-400 focus:outline-none"
               >
                 <X size={12} />
               </button>
             </div>
           );
         })}
-        
-        <div className="flex-1 min-w-[20px]" />
-        <ChevronDown size={16} className={`text-[var(--text-muted)] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+
+        <div className="flex-1" style={{ minWidth: '20px' }} />
+        <ChevronDown
+          size={16}
+          style={{ color: 'var(--text-tertiary)', transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'none', flexShrink: 0 }}
+        />
       </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-md shadow-lg z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="p-2 border-b border-[var(--border)]">
-            <input 
-              type="text" 
-              className="input w-full h-8 text-[13px]" 
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            left: 0,
+            right: 0,
+            background: '#1a2235',
+            border: '1px solid var(--border-strong)',
+            borderRadius: '8px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+            zIndex: 9999,
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ padding: '8px', borderBottom: '1px solid var(--border-subtle)' }}>
+            <input
+              type="text"
+              className="input"
+              style={{ height: '32px', fontSize: '13px', width: '100%' }}
               placeholder="Search segments..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               onClick={e => e.stopPropagation()}
             />
           </div>
-          <div className="max-h-48 overflow-y-auto p-1">
+          <div style={{ maxHeight: '200px', overflowY: 'auto', padding: '4px' }}>
             {filteredSegments.length > 0 ? (
               filteredSegments.map(seg => {
                 const isSelected = value.includes(seg.name);
                 return (
-                  <div 
+                  <div
                     key={seg._id}
-                    className="flex items-center justify-between px-3 py-2 cursor-pointer rounded-sm hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      borderRadius: '6px',
+                      background: isSelected ? 'rgba(59,130,246,0.08)' : 'transparent',
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                    onMouseLeave={e => e.currentTarget.style.background = isSelected ? 'rgba(59,130,246,0.08)' : 'transparent'}
                     onClick={() => toggleSegment(seg.name)}
                   >
                     <SegmentBadge name={seg.name} color={seg.color} />
-                    {isSelected && <Check size={14} className="text-[var(--gold)]" />}
+                    {isSelected && <Check size={14} style={{ color: 'var(--brand-primary)', flexShrink: 0 }} />}
                   </div>
                 );
               })
             ) : (
-              <div className="p-3 text-center text-[12px] text-[var(--text-muted)]">
+              <div style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: 'var(--text-tertiary)' }}>
                 No segments found
               </div>
             )}

@@ -40,7 +40,7 @@ const InviteMemberModal = ({ isOpen, onClose, onInvite }) => {
                 type="text"
                 required
                 className="input pl-9"
-                placeholder="Jane Doe"
+                placeholder="Steve Rogers"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
@@ -57,7 +57,7 @@ const InviteMemberModal = ({ isOpen, onClose, onInvite }) => {
                 type="email"
                 required
                 className="input pl-9"
-                placeholder="jane@company.com"
+                placeholder="steve@company.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />

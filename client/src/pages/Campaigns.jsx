@@ -9,7 +9,12 @@ import Skeleton from '../components/ui/Skeleton';
 const STATUS_FILTERS = ['', 'Draft', 'Scheduled', 'Active', 'Completed'];
 
 const getStatusBadge = (status) => {
-  const map = { Active: 'badge-jade', Scheduled: 'badge-copper', Completed: 'badge-neutral', Draft: 'badge-neutral' };
+  const map = { 
+    Active: 'badge-success', 
+    Scheduled: 'badge-blue', 
+    Completed: 'badge-neutral', 
+    Draft: 'badge-neutral' 
+  };
   return map[status] || 'badge-neutral';
 };
 
@@ -43,17 +48,17 @@ const Campaigns = () => {
   useEffect(() => { fetchCampaigns(); }, [fetchCampaigns]);
 
   return (
-    <div className="page-full">
+    <div className="page-scroll flex flex-col h-[calc(100vh-var(--header-height))]">
       {/* Header */}
       <div className="page-header shrink-0">
         <div>
-          <h1 className="text-display mb-1">Campaigns</h1>
+          <h1 className="heading-1 mb-1">Campaigns</h1>
           <p className="text-body">Create, schedule, and track your marketing campaigns.</p>
         </div>
-        <div className="page-header-actions">
+        <div className="flex items-center gap-3">
           <button className="btn btn-primary" onClick={() => navigate('/campaigns/new')}>
-            <Plus size={14} />
-            <span className="hide-mobile">New Campaign</span>
+            <Plus size={16} />
+            <span className="hidden sm:inline">New Campaign</span>
           </button>
         </div>
       </div>
@@ -62,8 +67,7 @@ const Campaigns = () => {
       <div className="card flex flex-col flex-1 min-h-0 overflow-hidden">
 
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center p-4 border-b shrink-0"
-          style={{ borderColor: 'var(--border)', background: 'var(--bg-elevated)' }}>
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 border-b border-[var(--border-subtle)] shrink-0">
           <SearchBar
             onSearch={(t) => { setSearch(t); setPage(1); }}
             placeholder="Search campaigns…"
@@ -71,18 +75,16 @@ const Campaigns = () => {
           />
 
           {/* Status segmented control */}
-          <div className="flex items-center gap-1 p-1 rounded-[10px]"
-            style={{ background: 'var(--bg-input)', border: '1px solid var(--border)' }}>
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-surface-hover)]">
             {STATUS_FILTERS.map(status => (
               <button
                 key={status}
                 onClick={() => { setStatusFilter(status); setPage(1); }}
-                className="px-3 py-1 rounded-md text-[12.5px] font-medium transition-colors whitespace-nowrap"
-                style={{
-                  color: statusFilter === status ? 'var(--text-primary)' : 'var(--text-muted)',
-                  background: statusFilter === status ? 'var(--bg-card)' : 'transparent',
-                  border: statusFilter === status ? '1px solid var(--border)' : '1px solid transparent',
-                }}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
+                  statusFilter === status 
+                    ? 'bg-[var(--bg-app)] text-white shadow-sm' 
+                    : 'text-[var(--text-secondary)] hover:text-white'
+                }`}
               >
                 {status || 'All'}
               </button>
@@ -91,122 +93,110 @@ const Campaigns = () => {
         </div>
 
         {/* Table */}
-        <div className="flex-1 overflow-auto" style={{ background: 'var(--bg-base)' }}>
+        <div className="flex-1 overflow-auto bg-[var(--bg-app)]">
           <div className="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>Campaign</th>
-                  <th>Status</th>
-                  <th>Type</th>
-                  <th>Audience</th>
-                  <th>Performance</th>
-                  <th style={{ width: '48px' }} />
+                  <th className="py-3 px-6 text-left">Campaign</th>
+                  <th className="py-3 px-6 text-left">Status</th>
+                  <th className="py-3 px-6 text-left">Type</th>
+                  <th className="py-3 px-6 text-left">Target Audience</th>
+                  <th className="py-3 px-6 text-left">Performance</th>
+                  <th className="py-3 px-6 text-right">Created</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={i}>
-                      <td><Skeleton className="w-40 h-3.5 mb-1.5" /><Skeleton className="w-28 h-3" /></td>
-                      <td><Skeleton className="w-16 h-5 rounded-full" /></td>
-                      <td><Skeleton className="w-14 h-3.5" /></td>
-                      <td><Skeleton className="w-20 h-3.5" /></td>
-                      <td><Skeleton className="w-24 h-3.5" /></td>
-                      <td />
+                      <td className="py-4 px-6"><Skeleton className="w-48 h-5" /></td>
+                      <td className="py-4 px-6"><Skeleton className="w-20 h-6 rounded-full" /></td>
+                      <td className="py-4 px-6"><Skeleton className="w-16 h-5" /></td>
+                      <td className="py-4 px-6"><Skeleton className="w-32 h-5" /></td>
+                      <td className="py-4 px-6"><Skeleton className="w-40 h-5" /></td>
+                      <td className="py-4 px-6"><div className="flex justify-end"><Skeleton className="w-24 h-5" /></div></td>
                     </tr>
                   ))
                 ) : campaigns.length === 0 ? (
                   <tr>
-                    <td colSpan="6">
-                      <div className="empty-state">
-                        <Megaphone size={28} style={{ color: 'var(--text-faint)' }} />
-                        <h3 className="text-heading">No campaigns found</h3>
-                        <p className="text-caption max-w-xs">Create your first campaign to start reaching your audience.</p>
+                    <td colSpan="6" className="text-center py-16">
+                      <div className="flex flex-col items-center">
+                        <Megaphone size={36} className="text-[var(--text-tertiary)] mb-4" />
+                        <p className="text-white font-bold text-lg">No campaigns found</p>
+                        <p className="text-[var(--text-secondary)] mt-1 mb-6">Create your first campaign to get started.</p>
+                        <button className="btn btn-primary" onClick={() => navigate('/campaigns/new')}>
+                          <Plus size={16} /> Create Campaign
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ) : (
-                  campaigns.map((campaign) => (
-                    <tr
-                      key={campaign._id}
-                      className="table-row cursor-pointer group"
-                      onClick={() => navigate(`/campaigns/${campaign._id}`)}
+                  campaigns.map((camp) => (
+                    <tr 
+                      key={camp._id} 
+                      className="cursor-pointer hover:bg-[var(--bg-surface-hover)] transition-colors border-b border-[var(--border-subtle)]"
+                      onClick={() => navigate(`/campaigns/${camp._id}`)}
                     >
-                      {/* Name + Subject */}
-                      <td>
-                        <div className="text-[13.5px] font-medium transition-colors"
-                          style={{ color: 'var(--text-primary)' }}
-                          onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
-                          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-primary)'}
-                        >
-                          {campaign.name}
-                        </div>
-                        <div className="text-[12px] mt-0.5 line-clamp-1 max-w-xs"
-                          style={{ color: 'var(--text-muted)' }}>
-                          {campaign.subject || 'No subject'}
-                        </div>
+                      <td className="py-4 px-6">
+                        <p className="font-semibold text-white truncate">{camp.name}</p>
+                        <p className="text-xs text-[var(--text-secondary)] mt-0.5 truncate max-w-[250px]">{camp.subject}</p>
                       </td>
-
-                      {/* Status */}
-                      <td>
-                        <span className={`badge ${getStatusBadge(campaign.status)}`}>
-                          {campaign.status}
-                        </span>
-                        {campaign.status === 'Scheduled' && campaign.scheduledDate && (
-                          <div className="flex items-center gap-1 mt-1.5 text-[11px]"
-                            style={{ color: 'var(--text-muted)' }}>
-                            <Calendar size={10} />
-                            {new Date(campaign.scheduledDate).toLocaleDateString()}
-                          </div>
-                        )}
-                      </td>
-
-                      {/* Type */}
-                      <td>
-                        <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>
-                          {campaign.type}
+                      <td className="py-4 px-6">
+                        <span className={`badge ${getStatusBadge(camp.status)}`}>
+                          {camp.status}
                         </span>
                       </td>
-
-                      {/* Audience */}
-                      <td>
-                        <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                          {campaign.targetSegments?.length > 0
-                            ? `${campaign.targetSegments.length} Segment${campaign.targetSegments.length > 1 ? 's' : ''}`
-                            : campaign.targetTags?.length > 0
-                            ? `${campaign.targetTags.length} Tag${campaign.targetTags.length > 1 ? 's' : ''}`
-                            : 'All Customers'}
-                        </span>
+                      <td className="py-4 px-6">
+                        <span className="text-sm font-medium text-[var(--text-primary)]">{camp.type}</span>
                       </td>
-
-                      {/* Performance */}
-                      <td>
-                        {(campaign.status === 'Completed' || campaign.status === 'Active') ? (
-                          <div className="flex items-center gap-3 text-[12.5px]">
-                            <span>
-                              <span style={{ color: 'var(--text-muted)' }}>Sent: </span>
-                              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                                {campaign.metrics?.sent ?? 0}
-                              </span>
+                      <td className="py-4 px-6">
+                        <div className="flex flex-col gap-1">
+                          {camp.targetSegments?.length > 0 && (
+                            <span className="text-xs text-[var(--text-secondary)] font-medium">
+                              {camp.targetSegments.length} Segments
                             </span>
-                            <span>
-                              <span style={{ color: 'var(--text-muted)' }}>Opened: </span>
-                              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
-                                {campaign.metrics?.opened ?? 0}
-                              </span>
+                          )}
+                          {camp.targetTags?.length > 0 && (
+                            <span className="text-xs text-[var(--text-secondary)] font-medium">
+                              {camp.targetTags.length} Tags
                             </span>
-                          </div>
+                          )}
+                          {(!camp.targetSegments?.length && !camp.targetTags?.length) && (
+                            <span className="text-xs text-[var(--text-tertiary)]">All Customers</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        {camp.status === 'Draft' || camp.status === 'Scheduled' ? (
+                          <span className="text-sm text-[var(--text-tertiary)]">—</span>
                         ) : (
-                          <span style={{ color: 'var(--text-faint)', fontSize: '13px' }}>—</span>
+                          <div className="flex items-center gap-4">
+                            <div className="flex flex-col">
+                              <span className="text-[10px] uppercase font-bold text-[var(--text-tertiary)]">Sent</span>
+                              <span className="text-sm font-bold text-white font-mono">{camp.metrics?.sent || 0}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] uppercase font-bold text-[var(--text-tertiary)]">Opened</span>
+                              <span className="text-sm font-bold text-[var(--status-success)] font-mono">{camp.metrics?.opened || 0}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] uppercase font-bold text-[var(--text-tertiary)]">Clicked</span>
+                              <span className="text-sm font-bold text-[var(--brand-primary)] font-mono">{camp.metrics?.clicked || 0}</span>
+                            </div>
+                          </div>
                         )}
                       </td>
-
-                      {/* Arrow */}
-                      <td>
-                        <span className="text-[var(--text-faint)] group-hover:text-[var(--gold)] transition-colors text-lg leading-none opacity-0 group-hover:opacity-100">
-                          →
-                        </span>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex flex-col items-end">
+                          <span className="text-sm font-medium text-[var(--text-secondary)]">
+                            {new Date(camp.createdAt).toLocaleDateString()}
+                          </span>
+                          <span className="text-xs text-[var(--text-tertiary)] flex items-center gap-1 mt-0.5">
+                            <Calendar size={10} className="text-[var(--brand-primary)]" />
+                            {new Date(camp.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -217,13 +207,15 @@ const Campaigns = () => {
         </div>
 
         {/* Pagination */}
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          totalItems={totalItems}
-          itemsPerPage={limit}
-          onPageChange={setPage}
-        />
+        <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={limit}
+            onPageChange={setPage}
+          />
+        </div>
       </div>
     </div>
   );

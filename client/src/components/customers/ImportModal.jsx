@@ -76,7 +76,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
 
   const downloadTemplate = () => {
     const headers = "name,email,phone,company,industry,location,status,segments,tags\n";
-    const example = "John Doe,john@example.com,555-0123,Acme Corp,Tech,New York,Lead,Lead;Premium,vip;q1\n";
+    const example = "Steve Rogers,steve@example.com,+91-9876543210,Acme Corp,Tech,Mumbai,Lead,Lead;Premium,vip;q1\n";
     const blob = new Blob([headers + example], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -87,10 +87,10 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
   };
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
+    <div className="modal-overlay">
+      <div className="modal-content sm:max-w-2xl mx-auto">
         
-        <div className="flex items-center justify-between p-5 border-b border-[var(--border)]">
+        <div className="modal-header">
           <h2 className="text-section text-[var(--text-primary)]">Import Customers</h2>
           <button 
             onClick={resetModal}
@@ -100,7 +100,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="modal-body">
           {!result ? (
             <>
               <div 
@@ -210,7 +210,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
           )}
         </div>
 
-        <div className="p-5 border-t border-[var(--border)] bg-[var(--bg-input)] flex justify-end space-x-3">
+        <div className="modal-footer">
           {result ? (
             <button
               onClick={() => {

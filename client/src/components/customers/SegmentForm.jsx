@@ -44,10 +44,10 @@ const SegmentForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitti
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
+    <div className="modal-overlay">
+      <div className="modal-content sm:max-w-md mx-auto">
         
-        <div className="flex items-center justify-between p-5 sm:p-6 border-b border-[var(--border)]">
+        <div className="modal-header">
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
             {initialData ? 'Edit Segment' : 'Create Segment'}
           </h2>
@@ -59,8 +59,8 @@ const SegmentForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitti
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-5 sm:p-6">
-          <div className="space-y-4">
+        <div className="modal-body">
+          <form id="segment-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             
             <div>
               <label className="label">Segment Name <span className="text-red-400">*</span></label>
@@ -125,26 +125,26 @@ const SegmentForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitti
                </span>
             </div>
 
-          </div>
-
-          <div className="mt-8 flex justify-end gap-3">
-            <button 
-              type="button" 
-              onClick={onClose}
-              className="btn bg-transparent hover:bg-[var(--bg-input)] text-[var(--text-secondary)] border border-[var(--border)]"
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="btn btn-primary"
-            >
-              <Save size={14} className="mr-1.5" />
-              {isSubmitting ? 'Saving...' : 'Save Segment'}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
+        <div className="modal-footer">
+          <button 
+            type="button" 
+            onClick={onClose}
+            className="btn btn-secondary"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            form="segment-form"
+            disabled={isSubmitting}
+            className="btn btn-primary"
+          >
+            <Save size={14} className="mr-1.5" />
+            {isSubmitting ? 'Saving...' : 'Save Segment'}
+          </button>
+        </div>
       </div>
     </div>
   );

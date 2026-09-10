@@ -42,126 +42,115 @@ const Settings = () => {
   };
 
   return (
-    <div className="page-enter">
+    <div className="page-scroll space-y-6">
       {/* Header */}
-      <div className="page-header">
+      <div className="page-header shrink-0">
         <div>
-          <h1 className="text-display mb-1">Settings</h1>
+          <h1 className="heading-1 mb-1">Settings</h1>
           <p className="text-body">Manage your account and preferences.</p>
         </div>
       </div>
 
-      <div className="max-w-3xl grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         {/* Left: Profile Card */}
-        <div className="space-y-4">
-          <div className="card p-6 flex flex-col items-center text-center">
+        <div className="space-y-6">
+          <div className="card p-6 flex flex-col items-center text-center relative overflow-hidden border-t-4 border-t-[var(--brand-primary)]">
+            
             {/* Avatar */}
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold mb-4 shrink-0"
-              style={{
-                background: 'var(--gold-dim)',
-                border: '2px solid var(--gold-border)',
-                color: 'var(--gold-light)',
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}
-            >
+            <div className="w-24 h-24 rounded-full bg-[var(--brand-primary)]/10 border border-[var(--brand-primary)]/20 flex items-center justify-center text-3xl font-bold text-[var(--brand-primary)] mb-5 shrink-0">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
 
-            <h3 className="text-heading mb-0.5">{user?.name}</h3>
-            <p className="text-caption mb-4">{user?.email}</p>
+            <h3 className="text-xl font-bold text-white mb-1">{user?.name}</h3>
+            <p className="text-sm text-[var(--text-secondary)] mb-6">{user?.email}</p>
 
             {/* Role badge */}
-            <div
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11.5px] font-medium"
-              style={{
-                background: 'var(--bg-hover)',
-                border: '1px solid var(--border)',
-                color: 'var(--text-secondary)',
-              }}
-            >
-              <Shield size={11} style={{ color: 'var(--gold)' }} />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider bg-[var(--brand-premium)]/10 text-[var(--brand-premium)]">
+              <Shield size={14} />
               {user?.role}
             </div>
           </div>
 
           {/* Sign out */}
-          <div className="card p-3">
+          <div className="card p-6">
             <button
               onClick={logout}
-              className="btn btn-danger btn-full"
+              className="w-full btn btn-danger"
             >
-              <LogOut size={14} />
+              <LogOut size={16} />
               Sign Out
             </button>
           </div>
         </div>
 
-        {/* Right: Edit Form */}
+        {/* Right: Profile Form */}
         <div className="md:col-span-2">
-          <div className="card p-6">
-            <h2 className="text-heading mb-6">Personal Information</h2>
+          <div className="card p-6" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
+            <div className="mb-6 pb-6 border-b border-[var(--border-subtle)]">
+              <h2 className="heading-3 mb-0">Profile Details</h2>
+              <p className="text-small">Update your personal information and password.</p>
+            </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              {/* Name */}
+            <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '28rem' }}>
               <div>
-                <label className="label">Full Name</label>
+                <label className="input-label">Full Name</label>
                 <div className="relative">
-                  <UserIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
+                  <UserIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none z-10" />
                   <input
                     type="text"
-                    className="input input-with-icon"
-                    placeholder="John Doe"
+                    className="input"
+                    style={{ paddingLeft: '2.5rem' }}
+                    placeholder="Steve Rogers"
                     {...register('name')}
                   />
                 </div>
-                {errors.name && <p className="field-error">{errors.name.message}</p>}
+                {errors.name && <p className="text-xs text-[var(--status-error)] mt-1.5">{errors.name.message}</p>}
               </div>
 
-              {/* Email */}
               <div>
-                <label className="label">Email Address</label>
+                <label className="input-label">Email Address</label>
                 <div className="relative">
-                  <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
+                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none z-10" />
                   <input
                     type="email"
-                    className="input input-with-icon"
-                    placeholder="john@example.com"
+                    className="input"
+                    style={{ paddingLeft: '2.5rem' }}
+                    placeholder="you@company.com"
                     {...register('email')}
                   />
                 </div>
-                {errors.email && <p className="field-error">{errors.email.message}</p>}
+                {errors.email && <p className="text-xs text-[var(--status-error)] mt-1.5">{errors.email.message}</p>}
               </div>
 
-              {/* Divider */}
-              <hr style={{ borderColor: 'var(--border)' }} />
-
-              {/* Password */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="label mb-0">Change Password</label>
-                  <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Leave blank to keep current</span>
-                </div>
+                <label className="input-label">
+                  New Password
+                  <span className="text-xs text-[var(--text-tertiary)] font-normal ml-2">(leave blank to keep current)</span>
+                </label>
                 <div className="relative">
-                  <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
+                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] pointer-events-none z-10" />
                   <input
                     type="password"
-                    className="input input-with-icon"
-                    placeholder="New password"
+                    className="input"
+                    style={{ paddingLeft: '2.5rem' }}
+                    placeholder="••••••••"
                     {...register('password')}
                   />
                 </div>
-                {errors.password && <p className="field-error">{errors.password.message}</p>}
+                {errors.password && <p className="text-xs text-[var(--status-error)] mt-1.5">{errors.password.message}</p>}
               </div>
 
-              {/* Submit */}
-              <div className="flex justify-end pt-2">
-                <button type="submit" disabled={isSaving} className="btn btn-primary">
+              <div style={{ paddingTop: '8px', display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="btn btn-primary"
+                >
                   {isSaving ? (
-                    <><span className="btn-spinner" /> Saving...</>
+                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
                   ) : (
-                    <><Save size={14} /> Save Changes</>
+                    <><Save size={16} /> Save Changes</>
                   )}
                 </button>
               </div>

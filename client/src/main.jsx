@@ -5,9 +5,7 @@ import './index.css'
 import { ToastProvider } from './contexts/ToastContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ToastProvider>
-      <App />
-    </ToastProvider>
-  </React.StrictMode>,
+  <ToastProvider>
+    <App />
+  </ToastProvider>,
 )

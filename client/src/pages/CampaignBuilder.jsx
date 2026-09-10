@@ -27,7 +27,7 @@ const CampaignBuilder = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const { addToast } = useToast();
+  const { toast } = useToast();
   const isNew = id === 'new';
 
   const passedState = location.state || {};
@@ -85,10 +85,10 @@ const CampaignBuilder = () => {
       isNew
         ? await campaignService.createCampaign(payload)
         : await campaignService.updateCampaign(id, payload);
-      addToast('Draft saved!', 'success');
+      toast.success('Draft saved!');
       navigate('/campaigns');
     } catch {
-      addToast('Failed to save draft', 'error');
+      toast.error('Failed to save draft');
     } finally {
       setSaving(false);
     }
@@ -99,250 +99,237 @@ const CampaignBuilder = () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     try {
       setSaving(true);
-      const payload = { ...data, status: 'Scheduled', scheduledDate: tomorrow };
+      const payload = { ...data, status: 'Scheduled', scheduledFor: tomorrow };
       isNew
         ? await campaignService.createCampaign(payload)
         : await campaignService.updateCampaign(id, payload);
-      addToast('Campaign scheduled!', 'success');
+      toast.success('Campaign scheduled!');
       navigate('/campaigns');
     } catch {
-      addToast('Failed to schedule', 'error');
+      toast.error('Failed to schedule campaign');
     } finally {
       setSaving(false);
     }
   };
 
-  const onDelete = async () => {
-    if (!window.confirm('Delete this campaign? This cannot be undone.')) return;
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this campaign?')) return;
     try {
       setDeleting(true);
       await campaignService.deleteCampaign(id);
-      addToast('Campaign deleted', 'success');
+      toast.success('Campaign deleted!');
       navigate('/campaigns');
-    } catch (error) {
-      addToast(error.response?.data?.error || 'Failed to delete', 'error');
-    } finally {
+    } catch {
+      toast.error('Failed to delete campaign');
       setDeleting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="page-enter">
-        <Skeleton className="w-32 h-4 mb-6" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 card p-6"><Skeleton className="w-full h-[400px]" /></div>
-          <div className="card p-6"><Skeleton className="w-full h-[200px]" /></div>
-        </div>
-      </div>
-    );
-  }
-
-  const isCompleted = campaign?.status === 'Completed';
+  const isReadOnly = campaign && ['Active', 'Completed'].includes(campaign.status);
 
   return (
-    <div className="page-enter">
-
-      {/* Back nav + actions */}
-      <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={() => navigate('/campaigns')}
-          className="flex items-center gap-1.5 text-[13px] transition-colors"
-          style={{ color: 'var(--text-muted)' }}
-          onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
-          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-        >
-          <ArrowLeft size={14} /> Campaigns
-        </button>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleSubmit(onSaveDraft)}
-            disabled={saving || isCompleted}
-            className="btn btn-outline"
+    <div className="page-scroll flex flex-col h-[calc(100vh-var(--header-height))] space-y-6">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between shrink-0 gap-4">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => navigate('/campaigns')}
+            className="p-1.5 -ml-1.5 text-[var(--text-secondary)] hover:text-white transition-colors rounded-lg hover:bg-[var(--bg-surface-hover)]"
           >
-            <Save size={13} /> Save Draft
+            <ArrowLeft size={20} />
           </button>
-          <button
-            type="button"
-            onClick={handleSubmit(onSchedule)}
-            disabled={saving || isCompleted}
-            className="btn btn-secondary"
-          >
-            <Calendar size={13} /> Schedule
-          </button>
-          {!isNew && campaign && !isCompleted && (
-            <button
-              type="button"
-              onClick={() => setIsLaunchModalOpen(true)}
-              className="btn btn-primary"
-            >
-              <Send size={13} /> Launch
+          <div>
+            <h1 className="heading-1 mb-0.5">{isNew ? 'New Campaign' : campaign?.name || 'Loading...'}</h1>
+            {!isNew && campaign && (
+              <span className={`badge ${
+                campaign.status === 'Active' ? 'badge-success' :
+                campaign.status === 'Scheduled' ? 'badge-blue' :
+                'badge-neutral'
+              }`}>
+                {campaign.status}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {!isNew && !isReadOnly && (
+            <button className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
+              <Trash2 size={14} /> Delete
             </button>
           )}
-          {!isNew && user?.role === 'Admin' && (
-            <button
-              type="button"
-              onClick={onDelete}
-              disabled={deleting}
-              className="btn btn-danger"
-            >
-              <Trash2 size={13} />
-            </button>
+          {!isReadOnly && (
+            <>
+              <button 
+                className="btn btn-secondary" 
+                onClick={handleSubmit(onSaveDraft)}
+                disabled={saving || loading}
+              >
+                <Save size={14} /> Save Draft
+              </button>
+              <button 
+                className="btn btn-secondary text-[var(--brand-premium)]" 
+                onClick={handleSubmit(onSchedule)}
+                disabled={saving || loading}
+              >
+                <Calendar size={14} /> Schedule
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => setIsLaunchModalOpen(true)}
+                disabled={saving || loading}
+              >
+                <Send size={14} /> Launch Now
+              </button>
+            </>
           )}
         </div>
       </div>
 
-      {/* Main layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-5">
-          <div className="card p-6">
-            <h2 className="text-heading mb-5">Campaign Setup</h2>
-            <div className="space-y-4">
-              {/* Name */}
+      <div className="flex-1 overflow-auto card" style={{ padding: '32px' }}>
+        {loading ? (
+          <div className="space-y-6 max-w-3xl">
+            <Skeleton className="w-full h-12 rounded-xl" />
+            <Skeleton className="w-1/2 h-12 rounded-xl" />
+            <Skeleton className="w-full h-48 rounded-xl" />
+          </div>
+        ) : (
+          <form id="campaign-form" style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '48rem' }}>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div>
-                <label className="label">Campaign Name *</label>
-                <input
-                  type="text"
-                  className="input"
+                <label className="input-label">Campaign Name <span style={{ color: 'var(--status-error)' }}>*</span></label>
+                <input 
+                  type="text" 
+                  className="input" 
                   placeholder="e.g. Summer Flash Sale"
-                  {...register('name')}
+                  disabled={isReadOnly}
+                  {...register('name')} 
                 />
-                {errors.name && <p className="field-error">{errors.name.message}</p>}
+                {errors.name && <p className="text-xs text-[var(--status-error)] mt-1.5">{errors.name.message}</p>}
               </div>
 
-              {/* Subject */}
-              <div>
-                <label className="label">Subject Line</label>
-                <input
-                  type="text"
-                  className="input"
-                  placeholder="Don't miss out on these summer deals!"
-                  {...register('subject')}
-                />
-              </div>
-
-              {/* Content */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="label mb-0">Content</label>
-                  <button
-                    type="button"
-                    onClick={() => setIsAIModalOpen(true)}
-                    className="flex items-center gap-1.5 text-[12px] font-medium transition-colors"
-                    style={{ color: 'var(--gold)' }}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="input-label">Type</label>
+                  <select
+                    className="input"
+                    style={{
+                      background: 'rgba(10, 15, 28, 0.6)',
+                      color: 'var(--text-primary)',
+                      cursor: 'pointer',
+                      appearance: 'auto',
+                    }}
+                    disabled={isReadOnly}
+                    {...register('type')}
                   >
-                    <Sparkles size={12} /> Generate with AI
-                  </button>
+                    <option value="Email" style={{ background: '#111827', color: '#f9fafb' }}>Email</option>
+                    <option value="SMS" style={{ background: '#111827', color: '#f9fafb' }}>SMS</option>
+                  </select>
                 </div>
-                <textarea
-                  className="input w-full font-mono text-[13px] leading-relaxed"
-                  style={{ minHeight: '280px', resize: 'vertical' }}
-                  placeholder="Write your email or SMS content here…"
-                  {...register('content')}
-                />
-                <p className="text-[11.5px] mt-1.5" style={{ color: 'var(--text-muted)' }}>
-                  Variables: {'{{customer.name}}'}, {'{{customer.company}}'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-4">
-          <div className="card p-5">
-            <h3 className="text-label mb-5">Settings</h3>
-            <div className="space-y-4">
-              {/* Type */}
-              <div>
-                <label className="label">Campaign Type</label>
-                <select className="input" {...register('type')}>
-                  <option value="Email">Email</option>
-                  <option value="SMS">SMS</option>
-                </select>
-              </div>
-
-              {/* Segments */}
-              <div>
-                <label className="label">Target Segments</label>
-                <p className="text-[11.5px] mb-2" style={{ color: 'var(--text-muted)' }}>
-                  Send to customers in these segments.
-                </p>
-                <Controller
-                  name="targetSegments"
-                  control={control}
-                  render={({ field }) => (
-                    <SegmentSelector value={field.value} onChange={field.onChange} />
-                  )}
-                />
-              </div>
-
-              {/* Tags */}
-              <div>
-                <label className="label">Target Tags</label>
-                <p className="text-[11.5px] mb-2" style={{ color: 'var(--text-muted)' }}>
-                  Further refine audience by tags.
-                </p>
-                <Controller
-                  name="targetTags"
-                  control={control}
-                  render={({ field }) => (
-                    <TagInput value={field.value} onChange={field.onChange} />
-                  )}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Status Info */}
-          {!isNew && campaign && (
-            <div className="card p-5">
-              <h3 className="text-label mb-4">Status Info</h3>
-              <div className="space-y-3 text-[13px]">
-                <div className="flex justify-between items-center">
-                  <span style={{ color: 'var(--text-muted)' }}>Status</span>
-                  <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{campaign.status}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span style={{ color: 'var(--text-muted)' }}>Created</span>
-                  <span style={{ color: 'var(--text-secondary)' }}>
-                    {new Date(campaign.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                {campaign.scheduledDate && (
-                  <div className="flex justify-between items-center">
-                    <span style={{ color: 'var(--text-muted)' }}>Scheduled</span>
-                    <span style={{ color: 'var(--gold)' }}>
-                      {new Date(campaign.scheduledDate).toLocaleDateString()}
-                    </span>
+                {campaignType === 'Email' && (
+                  <div>
+                    <label className="input-label">Subject Line</label>
+                    <input 
+                      type="text" 
+                      className="input" 
+                      placeholder="Subject line for email..."
+                      disabled={isReadOnly}
+                      {...register('subject')} 
+                    />
                   </div>
                 )}
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="pt-6 border-t border-[var(--border-subtle)]">
+              <h3 className="heading-3 mb-4">Target Audience</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="input-label">Include Segments</label>
+                  <Controller
+                    name="targetSegments"
+                    control={control}
+                    render={({ field }) => (
+                      <SegmentSelector 
+                        value={field.value} 
+                        onChange={field.onChange} 
+                        disabled={isReadOnly}
+                      />
+                    )}
+                  />
+                </div>
+                <div>
+                  <label className="input-label">Include Tags</label>
+                  <Controller
+                    name="targetTags"
+                    control={control}
+                    render={({ field }) => (
+                      <TagInput 
+                        value={field.value} 
+                        onChange={field.onChange} 
+                        disabled={isReadOnly}
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-[var(--border-subtle)]">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="heading-3">Content / Message</h3>
+                {!isReadOnly && user?.role !== 'Sales Executive' && (
+                  <button 
+                    type="button"
+                    onClick={() => setIsAIModalOpen(true)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[var(--brand-ai)] hover:text-white transition-colors py-1.5 px-3 rounded-md bg-[var(--brand-ai)]/10 hover:bg-[var(--brand-ai)]/20"
+                  >
+                    <Sparkles size={14} />
+                    Generate with AI
+                  </button>
+                )}
+              </div>
+              <textarea 
+                className="input" 
+                style={{ paddingTop: '12px', paddingBottom: '12px', minHeight: '240px', resize: 'vertical', lineHeight: '1.6' }} 
+                placeholder={campaignType === 'Email' ? 'Write your email content...' : 'Write your SMS message...'}
+                disabled={isReadOnly}
+                {...register('content')} 
+              />
+            </div>
+
+          </form>
+        )}
       </div>
 
-      <AIGeneratorModal
+      <AIGeneratorModal 
         isOpen={isAIModalOpen}
         onClose={() => setIsAIModalOpen(false)}
-        onApply={(content) => setValue('content', content)}
         campaignContext={{
-          type: campaignType,
+          type: watch('type'),
           targetSegments: watch('targetSegments'),
           targetTags: watch('targetTags')
+        }}
+        onApply={(generatedContent) => {
+          setValue('content', generatedContent);
+          toast.success('AI content applied to campaign!');
         }}
       />
 
       <LaunchCampaignModal
         isOpen={isLaunchModalOpen}
         onClose={() => setIsLaunchModalOpen(false)}
-        campaign={campaign}
-        onLaunchSuccess={() => { setIsLaunchModalOpen(false); navigate(0); }}
+        campaign={{
+          ...watch(),
+          _id: id,
+          isNew
+        }}
+        onLaunchSuccess={() => {
+          toast.success('Campaign launched successfully!');
+          navigate('/campaigns');
+        }}
       />
     </div>
   );

@@ -6,17 +6,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex items-center justify-between px-5 py-3 border-t shrink-0"
-      style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
-
+    <div className="flex items-center justify-between px-6 py-4 border-t border-nexus-800 bg-nexus-900/50 shrink-0">
       {/* Count info */}
-      <p className="text-caption">
+      <p className="text-sm text-nexus-400">
         {totalItems > 0 ? (
           <>
-            <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{startItem}–{endItem}</span>
-            {' of '}
-            <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{totalItems}</span>
-            {' results'}
+            Showing <span className="font-medium text-white">{startItem}</span> to <span className="font-medium text-white">{endItem}</span> of <span className="font-medium text-white">{totalItems}</span> results
           </>
         ) : (
           'No results'
@@ -28,23 +23,23 @@ const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPe
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="btn btn-outline h-8 w-8 p-0"
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-nexus-700 bg-nexus-800 text-white hover:bg-nexus-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           aria-label="Previous page"
         >
-          <ChevronLeft size={14} />
+          <ChevronLeft size={16} />
         </button>
 
-        <span className="text-[12.5px] font-medium px-1" style={{ color: 'var(--text-primary)' }}>
+        <span className="text-sm font-medium px-2 text-white">
           {currentPage} / {totalPages || 1}
         </span>
 
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="btn btn-outline h-8 w-8 p-0"
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-nexus-700 bg-nexus-800 text-white hover:bg-nexus-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           aria-label="Next page"
         >
-          <ChevronRight size={14} />
+          <ChevronRight size={16} />
         </button>
       </div>
     </div>

@@ -60,7 +60,7 @@ const CampaignPerformanceChart = ({ data }) => {
             <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} iconType="circle" />
             <Bar dataKey="Sent" fill="var(--text-secondary)" radius={[4, 4, 0, 0]} maxBarSize={40} />
             <Bar dataKey="Opened" fill="var(--gold)" radius={[4, 4, 0, 0]} maxBarSize={40} />
-            <Bar dataKey="Clicked" fill="var(--accent-primary)" radius={[4, 4, 0, 0]} maxBarSize={40} />
+            <Bar dataKey="Clicked" fill="var(--brand-primary)" radius={[4, 4, 0, 0]} maxBarSize={40} />
           </BarChart>
         </ResponsiveContainer>
       )}

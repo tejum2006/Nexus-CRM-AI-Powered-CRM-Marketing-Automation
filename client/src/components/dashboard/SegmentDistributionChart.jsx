@@ -2,7 +2,7 @@ import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const COLORS = [
-  'var(--accent-primary)',
+  'var(--brand-primary)',
   'var(--gold)',
   'var(--text-secondary)',
   '#10b981', // emerald

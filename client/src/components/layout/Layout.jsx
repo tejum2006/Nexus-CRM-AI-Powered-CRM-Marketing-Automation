@@ -6,16 +6,14 @@ import { useAuth } from '../../hooks/useAuth';
 
 const Layout = () => {
   const { user, loading } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const toggleMobileSidebar = () => setIsMobileOpen(prev => !prev);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
-        <div className="btn-spinner" style={{ width: '24px', height: '24px' }}></div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-app)]">
+        <div className="w-8 h-8 border-2 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -25,16 +23,27 @@ const Layout = () => {
   }
 
   return (
-    <div className="app-layout min-h-screen text-[var(--text-primary)]">
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+    <div className="app-layout">
+      <Sidebar 
+        isMobileOpen={isMobileOpen} 
+        toggleMobileSidebar={toggleMobileSidebar}
+      />
 
       <div className="main-content">
-        <Topbar toggleSidebar={toggleSidebar} />
+        <Topbar toggleMobileSidebar={toggleMobileSidebar} />
 
-        <main className="flex-1 flex flex-col min-h-0 overflow-x-hidden">
+        <main className="page-scroll">
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={toggleMobileSidebar}
+        />
+      )}
     </div>
   );
 };

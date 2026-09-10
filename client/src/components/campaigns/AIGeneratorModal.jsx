@@ -58,11 +58,12 @@ const AIGeneratorModal = ({ isOpen, onClose, onApply, campaignContext }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-      <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
+    <>
+      <div className="modal-overlay" onClick={onClose} />
+      <div className="modal-content" style={{ maxWidth: '800px', width: '95%' }}>
         
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[var(--border)] flex items-center justify-between bg-[var(--bg-surface)] shrink-0">
+        <div className="modal-header">
           <div className="flex items-center gap-2 text-[var(--gold)]">
             <Sparkles size={18} />
             <h2 className="text-base font-semibold text-[var(--text-primary)]">AI Content Generator</h2>
@@ -73,19 +74,19 @@ const AIGeneratorModal = ({ isOpen, onClose, onApply, campaignContext }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto p-4 sm:p-5">
+        <div className="modal-body scrollbar-hide">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+          <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: '24px', height: '100%' }}>
             
             {/* Left Column: Input */}
-            <div className="flex flex-col gap-5">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
               {/* Context Summary */}
-              <div className="bg-[var(--bg-input)] border border-[var(--border)] rounded-lg p-3 text-[12px]">
-                <p className="text-[var(--text-muted)] mb-1 font-medium">Campaign Context:</p>
-                <div className="flex flex-wrap gap-x-4 gap-y-1">
+              <div className="bg-[var(--bg-input)] border border-[var(--border)] rounded-lg" style={{ padding: '12px' }}>
+                <p className="text-[var(--text-muted)] mb-1 font-medium text-[12px]">Campaign Context:</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: '16px', rowGap: '4px', fontSize: '12px' }}>
                   <p><span className="text-[var(--text-secondary)]">Type:</span> <span className="text-[var(--text-primary)]">{campaignContext?.type}</span></p>
-                  <p><span className="text-[var(--text-secondary)]">Segments:</span> <span className="text-[var(--gold)]">{campaignContext?.targetSegments?.length ? campaignContext.targetSegments.join(', ') : 'All'}</span></p>
+                  <p><span className="text-[var(--text-secondary)]">Segments:</span> <span className="text-[var(--brand-primary)]">{campaignContext?.targetSegments?.length ? campaignContext.targetSegments.join(', ') : 'All'}</span></p>
                 </div>
               </div>
 
@@ -109,19 +110,21 @@ const AIGeneratorModal = ({ isOpen, onClose, onApply, campaignContext }) => {
               <div>
                 <label className="text-[12px] font-medium text-[var(--text-secondary)] mb-2 block">Tone of Voice</label>
                 <select 
-                  className="input py-1.5 text-[13px]"
+                  className="input"
+                  style={{ height: '32px', fontSize: '13px', background: 'rgba(10,15,28,0.6)', color: 'var(--text-primary)', cursor: 'pointer' }}
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
                 >
-                  {TONES.map(t => <option key={t} value={t}>{t}</option>)}
+                  {TONES.map(t => <option key={t} value={t} style={{ background: '#111827' }}>{t}</option>)}
                 </select>
               </div>
 
               {/* Custom Prompt */}
-              <div className="flex-1 flex flex-col min-h-[150px]">
+              <div className="flex-1 flex flex-col" style={{ minHeight: '150px' }}>
                 <label className="text-[12px] font-medium text-[var(--text-secondary)] mb-2 block">Custom Instructions</label>
                 <textarea
-                  className="input flex-1 w-full resize-none text-[13px]"
+                  className="input flex-1 w-full"
+                  style={{ resize: 'none', fontSize: '13px', padding: '12px' }}
                   placeholder="Describe what you want the AI to write..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
@@ -144,11 +147,11 @@ const AIGeneratorModal = ({ isOpen, onClose, onApply, campaignContext }) => {
 
             {/* Right Column: Output */}
             <div className="flex flex-col h-full bg-[var(--bg-surface)] border border-[var(--border)] rounded-lg overflow-hidden">
-              <div className="p-3 border-b border-[var(--border)] bg-[var(--bg-input)] shrink-0">
+              <div className="bg-[var(--bg-input)] border-b border-[var(--border)] shrink-0" style={{ padding: '12px' }}>
                 <span className="text-[12px] font-medium text-[var(--text-secondary)]">Generated Output</span>
               </div>
               
-              <div className="flex-1 p-4 overflow-auto">
+              <div className="flex-1 overflow-auto" style={{ padding: '16px' }}>
                 {isGenerating ? (
                   <div className="h-full flex flex-col items-center justify-center text-[var(--text-muted)] space-y-3">
                     <Loader2 size={24} className="animate-spin text-[var(--gold)]" />
@@ -182,7 +185,7 @@ const AIGeneratorModal = ({ isOpen, onClose, onApply, campaignContext }) => {
 
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

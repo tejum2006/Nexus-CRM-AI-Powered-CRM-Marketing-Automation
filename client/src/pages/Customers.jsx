@@ -103,27 +103,27 @@ const Customers = () => {
   };
 
   return (
-    <div className="page-full">
+    <div className="page-scroll flex flex-col h-[calc(100vh-var(--header-height))]">
       {/* Header */}
       <div className="page-header shrink-0">
         <div>
-          <h1 className="text-display mb-1">Customers</h1>
+          <h1 className="heading-1 mb-1">Customers</h1>
           <p className="text-body">Manage your contacts, segments, and relationships.</p>
         </div>
-        <div className="page-header-actions">
-          <button className="btn btn-outline" onClick={() => setIsImportOpen(true)}>
-            <Upload size={14} />
-            <span className="hide-mobile">Import</span>
+        <div className="flex items-center gap-3">
+          <button className="btn btn-secondary" onClick={() => setIsImportOpen(true)}>
+            <Upload size={16} />
+            <span className="hidden sm:inline">Import</span>
           </button>
           {user?.role === 'Admin' && (
-            <button className="btn btn-outline" onClick={handleExport} disabled={isExporting}>
-              <Download size={14} />
-              <span className="hide-mobile">{isExporting ? 'Exporting…' : 'Export'}</span>
+            <button className="btn btn-secondary" onClick={handleExport} disabled={isExporting}>
+              <Download size={16} />
+              <span className="hidden sm:inline">{isExporting ? 'Exporting…' : 'Export'}</span>
             </button>
           )}
           <button className="btn btn-primary" onClick={() => setIsFormOpen(true)}>
-            <Plus size={14} />
-            <span className="hide-mobile">Add Customer</span>
+            <Plus size={16} />
+            <span className="hidden sm:inline">Add Customer</span>
           </button>
         </div>
       </div>
@@ -131,8 +131,7 @@ const Customers = () => {
       {/* Table Card */}
       <div className="card flex flex-col flex-1 min-h-0 overflow-hidden">
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-3 p-4 border-b shrink-0"
-          style={{ borderColor: 'var(--border)', background: 'var(--bg-elevated)' }}>
+        <div className="flex flex-col sm:flex-row gap-4 p-4 shrink-0 border-b border-[var(--border-subtle)]">
           <SearchBar
             onSearch={handleSearch}
             placeholder="Search customers…"
@@ -148,7 +147,7 @@ const Customers = () => {
         </div>
 
         {/* Table */}
-        <div className="flex-1 overflow-auto" style={{ background: 'var(--bg-base)' }}>
+        <div className="flex-1 overflow-auto bg-[var(--bg-app)]">
           <CustomerTable
             customers={customers}
             loading={loading}
@@ -160,13 +159,15 @@ const Customers = () => {
         </div>
 
         {/* Pagination */}
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          totalItems={totalItems}
-          itemsPerPage={limit}
-          onPageChange={setPage}
-        />
+        <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={limit}
+            onPageChange={setPage}
+          />
+        </div>
       </div>
 
       <CustomerForm
