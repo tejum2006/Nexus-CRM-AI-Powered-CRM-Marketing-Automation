@@ -42,7 +42,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="page-scroll space-y-6">
+    <div className="page-scroll flex flex-col" style={{ gap: '24px' }}>
       {/* Header */}
       <div className="page-header shrink-0">
         <div>
@@ -54,8 +54,8 @@ const Settings = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         {/* Left: Profile Card */}
-        <div className="space-y-6">
-          <div className="card p-6 flex flex-col items-center text-center relative overflow-hidden border-t-4 border-t-[var(--brand-primary)]">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="card flex flex-col items-center text-center relative overflow-hidden border-t-4 border-t-[var(--brand-primary)]" style={{ padding: '24px' }}>
             
             {/* Avatar */}
             <div className="w-24 h-24 rounded-full bg-[var(--brand-primary)]/10 border border-[var(--brand-primary)]/20 flex items-center justify-center text-3xl font-bold text-[var(--brand-primary)] mb-5 shrink-0">
@@ -73,7 +73,7 @@ const Settings = () => {
           </div>
 
           {/* Sign out */}
-          <div className="card p-6">
+          <div className="card" style={{ padding: '24px' }}>
             <button
               onClick={logout}
               className="w-full btn btn-danger"
@@ -86,7 +86,7 @@ const Settings = () => {
 
         {/* Right: Profile Form */}
         <div className="md:col-span-2">
-          <div className="card p-6" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
+          <div className="card" style={{ padding: '24px', border: 'none', boxShadow: 'none', background: 'transparent' }}>
             <div className="mb-6 pb-6 border-b border-[var(--border-subtle)]">
               <h2 className="heading-3 mb-0">Profile Details</h2>
               <p className="text-small">Update your personal information and password.</p>

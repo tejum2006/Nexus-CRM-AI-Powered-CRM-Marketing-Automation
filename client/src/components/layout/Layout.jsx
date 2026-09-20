@@ -7,8 +7,15 @@ import { useAuth } from '../../hooks/useAuth';
 const Layout = () => {
   const { user, loading } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktopClosed, setIsDesktopClosed] = useState(false);
 
-  const toggleMobileSidebar = () => setIsMobileOpen(prev => !prev);
+  const toggleSidebar = () => {
+    if (window.innerWidth >= 1024) {
+      setIsDesktopClosed(prev => !prev);
+    } else {
+      setIsMobileOpen(prev => !prev);
+    }
+  };
 
   if (loading) {
     return (
@@ -26,11 +33,12 @@ const Layout = () => {
     <div className="app-layout">
       <Sidebar 
         isMobileOpen={isMobileOpen} 
-        toggleMobileSidebar={toggleMobileSidebar}
+        isDesktopClosed={isDesktopClosed}
+        toggleSidebar={toggleSidebar}
       />
 
       <div className="main-content">
-        <Topbar toggleMobileSidebar={toggleMobileSidebar} />
+        <Topbar toggleSidebar={toggleSidebar} isDesktopClosed={isDesktopClosed} />
 
         <main className="page-scroll">
           <Outlet />
@@ -41,7 +49,7 @@ const Layout = () => {
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-          onClick={toggleMobileSidebar}
+          onClick={toggleSidebar}
         />
       )}
     </div>

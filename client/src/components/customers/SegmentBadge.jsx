@@ -10,13 +10,15 @@ const SegmentBadge = ({ name, color, segment }) => {
   
   return (
     <span
-      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+      className="inline-flex items-center rounded-full text-xs font-semibold whitespace-nowrap"
       style={{
         backgroundColor: `color-mix(in srgb, ${badgeColor} 15%, transparent)`,
         borderColor: `color-mix(in srgb, ${badgeColor} 35%, transparent)`,
         borderWidth: '1px',
         borderStyle: 'solid',
         color: badgeColor,
+        padding: '4px 12px',
+        gap: '8px',
       }}
     >
       <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: badgeColor }} />

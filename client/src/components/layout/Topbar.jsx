@@ -3,62 +3,44 @@ import { Menu, Bell, Plus, ChevronRight } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-const Topbar = ({ toggleMobileSidebar }) => {
+const Topbar = ({ toggleSidebar, isDesktopClosed }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Generate simple breadcrumbs from location
-  const pathParts = location.pathname.split('/').filter(Boolean);
-  const breadcrumbs = pathParts.map((part, index) => {
-    const isLast = index === pathParts.length - 1;
-    const title = part.charAt(0).toUpperCase() + part.slice(1).replace('-', ' ');
-    return { title, isLast };
-  });
-
   return (
     <header className="h-[var(--header-height)] px-6 lg:px-8 flex items-center justify-between shrink-0 w-full bg-[var(--bg-app)] border-b border-[var(--border-subtle)] sticky top-0 z-40">
       
-      {/* Left Area: Mobile Toggle & Breadcrumbs */}
-      <div className="flex items-center gap-4 min-w-0">
+      {/* Left Area: Mobile Toggle & Conditional Brand */}
+      <div className="flex items-center min-w-0">
         <button
-          className="lg:hidden p-1.5 -ml-1.5 text-[var(--text-secondary)] hover:text-white rounded-lg transition-colors shrink-0"
-          onClick={toggleMobileSidebar}
+          className={`p-1.5 -ml-1.5 mr-3 text-[var(--brand-premium)] hover:bg-[var(--brand-premium)]/10 rounded-lg transition-colors shrink-0 ${isDesktopClosed ? '' : 'lg:hidden'}`}
+          onClick={toggleSidebar}
         >
           <Menu size={20} />
         </button>
 
-        <div className="hidden sm:flex items-center gap-2 text-sm">
-          {breadcrumbs.length > 0 ? (
-            breadcrumbs.map((bc, i) => (
-              <React.Fragment key={i}>
-                <span className={bc.isLast ? 'text-white font-semibold' : 'text-[var(--text-secondary)]'}>
-                  {bc.title}
-                </span>
-                {!bc.isLast && <ChevronRight size={14} className="text-[var(--text-tertiary)]" />}
-              </React.Fragment>
-            ))
-          ) : (
-            <span className="text-white font-semibold">Overview</span>
-          )}
+        {/* Show brand on mobile, OR on desktop if sidebar is closed */}
+        <div className={`items-center gap-3 min-w-0 flex ${isDesktopClosed ? '' : 'lg:hidden'}`}>
+          <div className="w-8 h-8 shrink-0 flex items-center justify-center rounded-lg overflow-hidden shadow-lg border border-[var(--border-subtle)]">
+            <img src="/logo.png" alt="Nexus Logo" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex flex-col justify-center min-w-0">
+            <span style={{ fontFamily: 'Michroma, sans-serif' }} className="text-base leading-none text-white whitespace-nowrap tracking-wide">
+              NEXUS
+            </span>
+            <span className="mt-0.5 text-[var(--brand-primary)] text-[9px] uppercase tracking-[0.2em] font-sans font-bold leading-none whitespace-nowrap">
+              CRM
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Right Area: Actions */}
+        {/* Right Area: Actions */}
       <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-        
-        <button
-          onClick={() => navigate('/campaigns/new')}
-          className="btn btn-primary h-8 px-3 rounded-lg text-xs"
-        >
-          <Plus size={14} />
-          <span className="hidden sm:inline">New Campaign</span>
-        </button>
-
-        <div className="w-px h-5 bg-[var(--border-strong)] hidden sm:block mx-1" />
 
         <button
-          className="relative p-1.5 text-[var(--text-secondary)] hover:text-white rounded-lg transition-colors"
+          className="relative p-1.5 text-[var(--brand-premium)] hover:bg-[var(--brand-premium)]/10 rounded-lg transition-colors"
           title="Notifications (coming soon)"
           onClick={() => {}}
         >

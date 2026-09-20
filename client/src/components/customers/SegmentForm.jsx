@@ -60,7 +60,7 @@ const SegmentForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitti
         </div>
 
         <div className="modal-body">
-          <form id="segment-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form id="segment-form" onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
             <div>
               <label className="label">Segment Name <span className="text-red-400">*</span></label>
@@ -111,16 +111,19 @@ const SegmentForm = ({ isOpen, onClose, onSubmit, initialData = null, isSubmitti
             </div>
 
             {/* Preview */}
-            <div className="mt-6 p-4 bg-[var(--bg-input)] border border-[var(--border)] rounded-lg">
-               <p className="text-[11px] text-[var(--text-muted)] mb-2 font-medium">Badge Preview</p>
+            <div className="bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] rounded-lg" style={{ padding: '16px' }}>
+               <p className="text-[11px] text-[var(--text-tertiary)] mb-2 font-medium">Badge Preview</p>
                <span 
-                 className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11.5px] font-medium border"
+                 className="inline-flex items-center rounded-full text-[11.5px] font-medium border"
                  style={{ 
                    backgroundColor: `${currentColor}15`, 
                    color: currentColor,
-                   borderColor: `${currentColor}30`
+                   borderColor: `${currentColor}30`,
+                   padding: '4px 12px',
+                   gap: '8px'
                  }}
                >
+                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: currentColor }} />
                  {watch('name') || 'Segment Name'}
                </span>
             </div>

@@ -90,7 +90,7 @@ const AIGenerator = () => {
   };
 
   return (
-    <div className="page-scroll flex flex-col h-[calc(100vh-var(--header-height))]">
+    <div className="page-scroll flex flex-col" style={{ height: 'calc(100vh - var(--header-height))', gap: '24px' }}>
       
       {/* Header */}
       <div className="page-header shrink-0 flex items-center justify-between">
@@ -110,12 +110,13 @@ const AIGenerator = () => {
           
           <div className="card" style={{ padding: '28px' }}>
             <h3 className="heading-3 mb-4">Quick Templates</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '12px' }}>
               {TEMPLATES.map(t => (
                 <button
                   key={t.id}
                   onClick={() => handleTemplateClick(t.prompt)}
-                  className="flex items-start gap-3 p-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--bg-surface-hover)] transition-colors text-left"
+                  className="flex items-start rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:bg-[var(--bg-surface-hover)] transition-colors text-left"
+                  style={{ padding: '12px', gap: '12px' }}
                 >
                   <t.icon size={16} className="text-[var(--text-secondary)] mt-0.5 shrink-0" />
                   <div>
@@ -167,7 +168,7 @@ const AIGenerator = () => {
                 </div>
               </div>
 
-              <div className="bg-[var(--bg-app)] p-5 rounded-lg border border-[var(--border-subtle)] space-y-4">
+              <div className="bg-[var(--bg-app)] rounded-lg border border-[var(--border-subtle)]" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
                   <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Context (Optional)</h4>
                   <p className="text-xs text-[var(--text-secondary)]">
@@ -218,7 +219,7 @@ const AIGenerator = () => {
         {/* Right Column: Output */}
         <div className="flex flex-col gap-6">
           <div className="card flex flex-col h-full min-h-[500px]">
-            <div className="px-6 py-5 border-b border-[var(--border-subtle)] flex items-center justify-between shrink-0">
+            <div className="border-b border-[var(--border-subtle)] flex items-center justify-between shrink-0" style={{ padding: '24px' }}>
               <h2 className="heading-3 mb-0">Generated Content</h2>
               {output && (
                 <button 
@@ -231,7 +232,7 @@ const AIGenerator = () => {
               )}
             </div>
 
-            <div className="flex-1 p-6 overflow-y-auto bg-[var(--bg-app)]">
+            <div className="flex-1 overflow-y-auto bg-[var(--bg-app)]" style={{ padding: '24px' }}>
               {!output && !isGenerating ? (
                 <div className="h-full flex flex-col items-center justify-center text-[var(--text-tertiary)]">
                   <Wand2 size={40} className="mb-4 opacity-30" />
@@ -255,7 +256,7 @@ const AIGenerator = () => {
             </div>
 
             {output && (
-              <div className="p-6 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] shrink-0">
+              <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] shrink-0" style={{ padding: '24px' }}>
                 <button 
                   onClick={handleCreateCampaign}
                   className="w-full btn bg-[var(--brand-premium)] hover:bg-[var(--brand-premium)]/90 text-white"

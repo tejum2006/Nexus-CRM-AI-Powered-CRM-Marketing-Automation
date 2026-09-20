@@ -7,13 +7,13 @@ import {
   Megaphone,
   Sparkles,
   Settings,
-  X,
+  PanelLeftClose,
   ShieldCheck,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
-const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
+const Sidebar = ({ isMobileOpen, isDesktopClosed, toggleSidebar }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -65,7 +65,7 @@ const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
 
   const handleNav = () => {
     if (window.innerWidth <= 1024) {
-      toggleMobileSidebar();
+      toggleSidebar();
     }
   };
 
@@ -82,13 +82,13 @@ const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
       transition-all duration-200
       ${isActive
         ? `
-            bg-[var(--brand-ai-glow)]
-            text-[var(--brand-primary)]
+            bg-[var(--brand-premium)]/10
+            text-[var(--brand-premium)]
           `
         : `
             text-[var(--text-secondary)]
             hover:bg-[var(--bg-surface-hover)]
-            hover:text-white
+            hover:text-[var(--brand-premium)]
           `
       }
     `;
@@ -118,6 +118,7 @@ const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
           ? 'translate-x-0'
           : '-translate-x-full lg:translate-x-0'
         }
+        ${isDesktopClosed ? 'lg:hidden' : 'lg:flex'}
       `}
     >
       {/* =========================================================
@@ -180,29 +181,20 @@ const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
           </div>
         </div>
 
-        {/* Mobile Close */}
         <button
           type="button"
-          aria-label="Close navigation"
+          aria-label="Hide navigation"
           className="
-            lg:hidden
-
             flex items-center justify-center
-
             w-8 h-8
-
             rounded-lg
-
-            text-[var(--text-secondary)]
-
-            hover:text-white
-            hover:bg-[var(--bg-surface-hover)]
-
+            text-[var(--brand-premium)]
+            hover:bg-[var(--brand-premium)]/10
             transition-colors
           "
-          onClick={toggleMobileSidebar}
+          onClick={toggleSidebar}
         >
-          <X size={18} strokeWidth={2} />
+          <PanelLeftClose size={18} strokeWidth={2} />
         </button>
       </div>
 

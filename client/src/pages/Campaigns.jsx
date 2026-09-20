@@ -48,7 +48,7 @@ const Campaigns = () => {
   useEffect(() => { fetchCampaigns(); }, [fetchCampaigns]);
 
   return (
-    <div className="page-scroll flex flex-col h-[calc(100vh-var(--header-height))]">
+    <div className="page-scroll flex flex-col" style={{ height: 'calc(100vh - var(--header-height))', gap: '24px' }}>
       {/* Header */}
       <div className="page-header shrink-0">
         <div>
@@ -67,7 +67,7 @@ const Campaigns = () => {
       <div className="card flex flex-col flex-1 min-h-0 overflow-hidden">
 
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 border-b border-[var(--border-subtle)] shrink-0">
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center border-b border-[var(--border-subtle)] shrink-0 w-full" style={{ padding: '24px' }}>
           <SearchBar
             onSearch={(t) => { setSearch(t); setPage(1); }}
             placeholder="Search campaigns…"
@@ -207,7 +207,7 @@ const Campaigns = () => {
         </div>
 
         {/* Pagination */}
-        <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+        <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]" style={{ padding: '16px 24px' }}>
           <Pagination
             currentPage={page}
             totalPages={totalPages}

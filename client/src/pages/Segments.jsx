@@ -68,7 +68,7 @@ const Segments = () => {
   };
 
   return (
-    <div className="page-scroll">
+    <div className="page-scroll flex flex-col" style={{ gap: '24px' }}>
       {/* Page Header */}
       <div className="page-header">
         <div>
@@ -82,7 +82,7 @@ const Segments = () => {
 
         {/* Segments table */}
         <div className="card overflow-hidden">
-          <div className="flex items-center justify-between p-6 border-b border-[var(--border-subtle)] shrink-0">
+          <div className="flex items-center justify-between border-b border-[var(--border-subtle)] shrink-0" style={{ padding: '24px' }}>
             <div>
               <h2 className="heading-3 mb-0.5">Audience Segments</h2>
               <p className="text-small">Create distinct groups for targeted marketing campaigns.</p>
@@ -175,7 +175,7 @@ const Segments = () => {
         </div>
 
         {/* Tags List */}
-        <div className="card p-6 space-y-5">
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div className="pb-4 border-b border-[var(--border-subtle)]">
             <h2 className="heading-3 mb-0.5">Active Tags</h2>
             <p className="text-small">Tags used across your customers.</p>

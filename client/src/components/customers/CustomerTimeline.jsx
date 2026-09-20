@@ -29,19 +29,19 @@ const CustomerTimeline = ({ activities = [] }) => {
 
   if (!activities.length) {
     return (
-      <div className="p-8 text-center text-[var(--text-tertiary)] text-sm">
+      <div className="text-center text-[var(--text-tertiary)] text-sm" style={{ padding: '32px' }}>
         No activity recorded yet.
       </div>
     );
   }
 
   return (
-    <div className="relative ml-4 my-2" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="relative" style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginLeft: '16px', margin: '8px 0' }}>
       {/* Glowing Vertical Axis */}
       <div className="absolute top-2 bottom-2 left-0 w-0.5" style={{ background: 'linear-gradient(to bottom, rgba(59,130,246,0.5), transparent)' }} />
 
       {activities.map((activity, idx) => (
-        <div key={activity._id || idx} className="relative pl-7 group">
+        <div key={activity._id || idx} className="relative group" style={{ paddingLeft: '28px' }}>
           {/* Timeline Dot Icon */}
           <div 
             className="absolute -left-[17px] top-3.5 w-[34px] h-[34px] rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110"
@@ -52,7 +52,7 @@ const CustomerTimeline = ({ activities = [] }) => {
           
           {/* Content Card */}
           <div className="card transition-all duration-300 hover:translate-x-1" style={{ padding: '20px', background: 'var(--bg-app)' }}>
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between" style={{ gap: '16px' }}>
               <div>
                 <h4 className="text-sm font-semibold text-[var(--text-primary)]">
                   {activity.title}
@@ -69,7 +69,7 @@ const CustomerTimeline = ({ activities = [] }) => {
               </div>
             </div>
             
-            <div className="mt-3 text-xs text-[var(--text-tertiary)] flex items-center gap-2 pt-3 border-t border-[var(--border-subtle)]">
+            <div className="text-xs text-[var(--text-tertiary)] flex items-center border-t border-[var(--border-subtle)]" style={{ marginTop: '12px', paddingTop: '12px', gap: '8px' }}>
                <div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold" style={{ background: 'rgba(59,130,246,0.2)', color: 'var(--brand-primary)' }}>
                  {activity.userName?.charAt(0)?.toUpperCase() || 'U'}
                </div>
