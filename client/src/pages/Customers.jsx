@@ -25,6 +25,7 @@ const Customers = () => {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState(null);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -87,6 +88,38 @@ const Customers = () => {
       toast.error('Failed to add customer.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdateCustomer = async (data) => {
+    try {
+      setIsSubmitting(true);
+      await customerService.updateCustomer(editingCustomer._id, data);
+      setIsFormOpen(false);
+      setEditingCustomer(null);
+      fetchCustomers();
+      toast.success('Customer updated!');
+    } catch {
+      toast.error('Failed to update customer.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditCustomer = (customer) => {
+    setEditingCustomer(customer);
+    setIsFormOpen(true);
+  };
+
+  const handleDeleteCustomer = async (id) => {
+    if (window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
+      try {
+        await customerService.deleteCustomer(id);
+        toast.success('Customer deleted successfully!');
+        fetchCustomers();
+      } catch {
+        toast.error('Failed to delete customer.');
+      }
     }
   };
 
@@ -154,6 +187,8 @@ const Customers = () => {
             onSort={handleSort}
             sortConfig={sortConfig}
             onRowClick={(id) => navigate(`/customers/${id}`)}
+            onEdit={handleEditCustomer}
+            onDelete={handleDeleteCustomer}
             availableSegments={availableSegments}
           />
         </div>
@@ -172,8 +207,12 @@ const Customers = () => {
 
       <CustomerForm
         isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSubmit={handleCreateCustomer}
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingCustomer(null);
+        }}
+        onSubmit={editingCustomer ? handleUpdateCustomer : handleCreateCustomer}
+        initialData={editingCustomer}
         isSubmitting={isSubmitting}
       />
       <ImportModal

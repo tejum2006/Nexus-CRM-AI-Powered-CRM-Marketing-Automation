@@ -82,11 +82,15 @@ const CampaignBuilder = () => {
     try {
       setSaving(true);
       const payload = { ...data, status: 'Draft' };
-      isNew
-        ? await campaignService.createCampaign(payload)
-        : await campaignService.updateCampaign(id, payload);
-      toast.success('Draft saved!');
-      navigate('/campaigns');
+      
+      if (isNew) {
+        const response = await campaignService.createCampaign(payload);
+        toast.success('Draft created! You can now test or launch it.');
+        navigate(`/campaigns/${response.data._id}`); // Stay on the builder page
+      } else {
+        await campaignService.updateCampaign(id, payload);
+        toast.success('Draft updated!');
+      }
     } catch {
       toast.error('Failed to save draft');
     } finally {
@@ -176,8 +180,15 @@ const CampaignBuilder = () => {
                 <Calendar size={14} /> Schedule
               </button>
               <button 
+                type="button"
                 className="btn btn-primary" 
-                onClick={() => setIsLaunchModalOpen(true)}
+                onClick={() => {
+                  if (isNew) {
+                    toast.error('Please save the campaign as a draft first before launching or testing.');
+                    return;
+                  }
+                  setIsLaunchModalOpen(true);
+                }}
                 disabled={saving || loading}
               >
                 <Send size={14} /> Launch Now

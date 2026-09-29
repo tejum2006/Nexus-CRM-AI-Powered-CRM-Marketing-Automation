@@ -5,7 +5,8 @@ const {
   createCampaign,
   updateCampaign,
   deleteCampaign,
-  launchCampaign
+  launchCampaign,
+  sendTestEmail
 } = require('../controllers/campaignController');
 
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -25,6 +26,7 @@ router
   .put(updateCampaign)
   .delete(authorize('Admin'), deleteCampaign);
 
-router.post('/:id/launch', launchCampaign);
+router.post('/:id/launch', authorize('Admin', 'Marketing Manager'), launchCampaign);
+router.post('/:id/test-email', authorize('Admin', 'Marketing Manager'), sendTestEmail);
 
 module.exports = router;

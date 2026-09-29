@@ -32,7 +32,7 @@ exports.generateContent = async (req, res, next) => {
     const fullPrompt = `${systemPrompt}\n\nUser Instructions: ${prompt}\n\nPlease generate the content now.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash-lite',
       contents: fullPrompt,
     });
 

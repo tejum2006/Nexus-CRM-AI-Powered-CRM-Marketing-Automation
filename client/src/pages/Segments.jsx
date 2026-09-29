@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tags as TagsIcon, Plus, Edit2, Trash2, Hash } from 'lucide-react';
+import { Tags as TagsIcon, Plus, Edit2, Trash2, Hash, Download } from 'lucide-react';
 import * as segmentService from '../services/segmentService';
 import * as customerService from '../services/customerService';
 import Skeleton from '../components/ui/Skeleton';
@@ -15,6 +15,7 @@ const Segments = () => {
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [editingSegment, setEditingSegment] = useState(null);
 
   const fetchData = useCallback(async () => {
@@ -67,6 +68,18 @@ const Segments = () => {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      toast.info('Exporting segments...');
+      await segmentService.exportSegments();
+    } catch {
+      toast.error('Failed to export segments.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="page-scroll flex flex-col" style={{ gap: '24px' }}>
       {/* Page Header */}
@@ -87,12 +100,23 @@ const Segments = () => {
               <h2 className="heading-3 mb-0.5">Audience Segments</h2>
               <p className="text-small">Create distinct groups for targeted marketing campaigns.</p>
             </div>
-            <button
-              className="btn btn-primary h-9 px-4 rounded-lg text-sm font-semibold shrink-0"
-              onClick={() => { setEditingSegment(null); setIsFormOpen(true); }}
-            >
-              <Plus size={16} /> <span className="hidden sm:inline">New Segment</span>
-            </button>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                className="btn btn-secondary h-9 px-4 rounded-lg text-sm font-semibold"
+                onClick={handleExport}
+                disabled={isExporting}
+              >
+                <Download size={16} className="mr-2" /> 
+                <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Export'}</span>
+              </button>
+              <button
+                className="btn btn-primary h-9 px-4 rounded-lg text-sm font-semibold"
+                onClick={() => { setEditingSegment(null); setIsFormOpen(true); }}
+              >
+                <Plus size={16} className="mr-2" /> 
+                <span className="hidden sm:inline">New Segment</span>
+              </button>
+            </div>
           </div>
 
           <div className="overflow-auto bg-[var(--bg-app)]">

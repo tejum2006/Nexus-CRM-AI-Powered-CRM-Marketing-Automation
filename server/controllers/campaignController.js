@@ -1,6 +1,7 @@
 const Campaign = require('../models/Campaign');
 const Activity = require('../models/Activity');
 const Customer = require('../models/Customer');
+const { sendEmail, sendBulkEmails } = require('../services/emailService');
 
 // Helper function to log campaign activities
 const logCampaignActivity = async (type, title, description, user, campaignId) => {
@@ -222,17 +223,42 @@ exports.launchCampaign = async (req, res, next) => {
     }
 
     const customers = await Customer.find(query);
-    const sentCount = customers.length;
+    const isSimulation = req.body.isSimulation !== false; // Default to true if not explicitly false
 
-    if (sentCount === 0) {
-      return res.status(400).json({ success: false, error: 'No customers match the target criteria.' });
+    let sentCount = 0;
+    let failedCount = 0;
+
+    if (isSimulation) {
+      sentCount = customers.length;
+    } else {
+      // REAL EMAIL SENDING
+      const validCustomers = customers.filter(c => c.email && c.email.includes('@'));
+      if (validCustomers.length === 0) {
+        return res.status(400).json({ success: false, error: 'No customers with valid emails found.' });
+      }
+
+      const messages = validCustomers.map(c => ({
+        to: c.email,
+        subject: campaign.subject || campaign.name,
+        html: campaign.content,
+      }));
+
+      try {
+        await sendBulkEmails(messages);
+        sentCount = validCustomers.length;
+      } catch (err) {
+        return res.status(500).json({ success: false, error: 'Failed to send campaign emails via provider.' });
+      }
     }
 
-    // Bulk insert activities for all matched customers
-    const activitiesToInsert = customers.map(c => ({
+    // Bulk insert activities for all matched customers (only those successfully processed)
+    // For simplicity, we assume if bulk send succeeds, all sent.
+    const processedCustomers = isSimulation ? customers : customers.filter(c => c.email && c.email.includes('@'));
+
+    const activitiesToInsert = processedCustomers.map(c => ({
       type: 'email_sent',
-      title: 'Campaign Received',
-      description: `Sent campaign: "${campaign.name}" via ${campaign.type}`,
+      title: isSimulation ? 'Campaign Received (Simulated)' : 'Campaign Received',
+      description: `Sent campaign: "${campaign.name}" via ${campaign.type}${isSimulation ? ' [SIMULATION]' : ''}`,
       customer: c._id,
       user: req.user.id,
       userName: req.user.name
@@ -244,7 +270,7 @@ exports.launchCampaign = async (req, res, next) => {
 
     // Update customers lastContacted date
     await Customer.updateMany(
-      { _id: { $in: customers.map(c => c._id) } },
+      { _id: { $in: processedCustomers.map(c => c._id) } },
       { $set: { lastContacted: new Date() } }
     );
 
@@ -255,17 +281,58 @@ exports.launchCampaign = async (req, res, next) => {
 
     await logCampaignActivity(
       'campaign_launched',
-      'Campaign Launched',
-      `Campaign "${campaign.name}" was launched to ${sentCount} customers.`,
+      isSimulation ? 'Campaign Simulated' : 'Campaign Launched',
+      `Campaign "${campaign.name}" was ${isSimulation ? 'simulated' : 'launched'} to ${sentCount} customers.`,
       req.user,
       campaign._id
     );
 
     res.status(200).json({
       success: true,
-      message: 'Campaign launched successfully',
+      message: isSimulation ? 'Campaign simulated successfully' : 'Campaign launched successfully',
       data: campaign
     });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Send a test email for a campaign
+// @route   POST /api/campaigns/:id/test-email
+// @access  Private
+exports.sendTestEmail = async (req, res, next) => {
+  try {
+    const { testEmail } = req.body;
+    
+    if (!testEmail || !testEmail.includes('@')) {
+      return res.status(400).json({ success: false, error: 'Valid test email is required' });
+    }
+
+    const campaign = await Campaign.findById(req.params.id);
+
+    if (!campaign) {
+      return res.status(404).json({ success: false, error: 'Campaign not found' });
+    }
+
+    if (!campaign.content) {
+      return res.status(400).json({ success: false, error: 'Campaign content is empty. Generate content first.' });
+    }
+
+    try {
+      await sendEmail({
+        to: testEmail,
+        subject: `[TEST] ${campaign.subject || campaign.name}`,
+        html: campaign.content
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Test email sent successfully'
+      });
+    } catch (sendError) {
+      return res.status(500).json({ success: false, error: 'Failed to send test email. Ensure SendGrid is properly configured.' });
+    }
 
   } catch (error) {
     next(error);

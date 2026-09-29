@@ -97,3 +97,43 @@ exports.deleteSegment = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Export segments to CSV
+// @route   GET /api/segments/export
+// @access  Private
+exports.exportSegments = async (req, res, next) => {
+  try {
+    const segments = await Segment.find().sort({ isDefault: -1, name: 1 });
+
+    const headers = ['Name', 'Color', 'IsDefault', 'CustomerCount'];
+    let csv = headers.join(',') + '\n';
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '';
+      let str = String(val);
+      if (/^[=\-+@]/.test(str)) {
+        str = "'" + str;
+      }
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    segments.forEach(segment => {
+      const row = [
+        escapeCsv(segment.name),
+        escapeCsv(segment.color),
+        escapeCsv(segment.isDefault),
+        escapeCsv(segment.customerCount || 0)
+      ];
+      csv += row.join(',') + '\n';
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=segments_export.csv');
+    res.status(200).send(csv);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Menu, Bell, Plus, ChevronRight } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Menu, Bell, CheckCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -7,6 +7,19 @@ const Topbar = ({ toggleSidebar, isDesktopClosed }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setIsNotifOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="h-[var(--header-height)] px-6 lg:px-8 flex items-center justify-between shrink-0 w-full bg-[var(--bg-app)] border-b border-[var(--border-subtle)] sticky top-0 z-40">
@@ -39,13 +52,36 @@ const Topbar = ({ toggleSidebar, isDesktopClosed }) => {
         {/* Right Area: Actions */}
       <div className="flex items-center gap-3 sm:gap-4 shrink-0">
 
-        <button
-          className="relative p-1.5 text-[var(--brand-premium)] hover:bg-[var(--brand-premium)]/10 rounded-lg transition-colors"
-          title="Notifications (coming soon)"
-          onClick={() => {}}
-        >
-          <Bell size={18} />
-        </button>
+        <div className="relative" ref={notifRef}>
+          <button
+            className={`relative p-2 rounded-lg transition-colors ${
+              isNotifOpen 
+                ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]' 
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)]'
+            }`}
+            onClick={() => setIsNotifOpen(!isNotifOpen)}
+          >
+            <Bell size={18} />
+          </button>
+
+          {isNotifOpen && (
+            <div className="absolute top-full right-0 mt-2 w-72 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+              <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-app)]">
+                <h3 className="font-semibold text-[var(--text-primary)] text-sm">Notifications</h3>
+                <button className="text-xs text-[var(--brand-primary)] hover:text-[var(--brand-premium)] transition-colors">
+                  Mark all as read
+                </button>
+              </div>
+              <div className="p-8 flex flex-col items-center justify-center text-center bg-[var(--bg-surface)]">
+                <div className="w-12 h-12 rounded-full bg-[var(--bg-surface-hover)] flex items-center justify-center mb-3">
+                  <CheckCircle size={24} className="text-[var(--text-tertiary)]" />
+                </div>
+                <p className="text-[var(--text-primary)] font-medium text-sm">You're all caught up!</p>
+                <p className="text-[var(--text-secondary)] text-xs mt-1">No new notifications right now.</p>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div
           onClick={() => navigate('/settings')}

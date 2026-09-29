@@ -25,7 +25,12 @@ export const deleteCampaign = async (id) => {
   return data;
 };
 
-export const launchCampaign = async (id) => {
-  const { data } = await api.post(`/campaigns/${id}/launch`);
+export const launchCampaign = async (id, isSimulation = true) => {
+  const { data } = await api.post(`/campaigns/${id}/launch`, { isSimulation });
+  return data;
+};
+
+export const sendTestEmail = async (id, testEmail) => {
+  const { data } = await api.post(`/campaigns/${id}/test-email`, { testEmail });
   return data;
 };

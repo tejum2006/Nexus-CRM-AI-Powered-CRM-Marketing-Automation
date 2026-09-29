@@ -3,7 +3,8 @@ const {
   getSegments,
   createSegment,
   updateSegment,
-  deleteSegment
+  deleteSegment,
+  exportSegments
 } = require('../controllers/segmentController');
 
 const { protect } = require('../middleware/authMiddleware');
@@ -11,6 +12,8 @@ const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.use(protect);
+
+router.get('/export', exportSegments);
 
 router
   .route('/')
