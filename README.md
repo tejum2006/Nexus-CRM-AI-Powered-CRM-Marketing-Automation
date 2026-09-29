@@ -173,7 +173,3 @@ All routes under `/api/customers`, `/api/campaigns`, `/api/segments`, `/api/ai`,
 | CORS error in browser | Set `CLIENT_URL` in `.env` to the exact origin of the frontend. |
 
 ---
-
-## Author
-
-Built with 🖤 by AI Copilot.
